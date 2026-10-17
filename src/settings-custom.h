@@ -56,6 +56,16 @@
     // L'altro risveglio e' l'appoggio della statuina, via RFID_IRQ (LPCD).
     #define WAKEUP_BUTTON                   NEXT_BUTTON
 
+    // ---------------- I2C ----------------
+    // ESPuino accende sempre il secondo bus I2C quando c'e' la selezione del
+    // lettore a runtime (gli serve per l'MFRC522 via I2C), quindi questi due
+    // nomi devono esistere. Ci attacchiamo il DS3231.
+    // Sono i pin di UART0: i log escono dalla USB nativa.
+    #ifdef I2C_2_ENABLE
+        #define ext_IIC_DATA                43         // SDA
+        #define ext_IIC_CLK                 44         // SCL
+    #endif
+
     // ---------------- misura della batteria ----------------
     #ifdef MEASURE_BATTERY_VOLTAGE
         #define VOLTAGE_READ_PIN             7
@@ -75,6 +85,4 @@
     #define BOX_EPD_DC                      15
     #define BOX_EPD_RST                     16
     #define BOX_EPD_BUSY                    17
-    #define BOX_I2C_SDA                     43          // DS3231 (pin di UART0: log sulla USB nativa)
-    #define BOX_I2C_SCL                     44
 #endif
