@@ -82,10 +82,5 @@
     // Usati dai moduli nuovi (task 1, 2): non sono nomi che ESPuino conosce.
     #define BOX_CURSORE_ADC                  2          // cursore volume (ADC1)
     #define BOX_CURSORE_PWR                 42          // alimenta il cursore solo da svegli
-    #define BOX_EPD_SCK                     12
-    #define BOX_EPD_MOSI                    13
-    #define BOX_EPD_CS                      14
-    #define BOX_EPD_DC                      15
-    #define BOX_EPD_RST                     16
-    #define BOX_EPD_BUSY                    17
+    // GPIO 12-17 liberi: erano del display e-paper, tolto il 18 ottobre.
 #endif
