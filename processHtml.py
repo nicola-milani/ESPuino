@@ -37,6 +37,7 @@ BINARY_FILES = [
     Path("locales/de.json"),
     Path("locales/en.json"),
     Path("locales/fr.json"),
+    Path("locales/it.json"),
     # Vendored frontend libraries for the management interface (previously loaded from CDN).
     # Self-hosted so the management interface no longer depends on internet access.
     Path("vendor/bootstrap/bootstrap.min.css"),
