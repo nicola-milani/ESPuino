@@ -102,6 +102,15 @@ static bool Rfid_Pn5180LpcdEnabled(void) {
 	return gPrefsRfid.getBool("pn5180Lpcd", false);
 }
 
+// [BOX] Dopo l'ESP32 il modo "ALL_LOW" non esiste piu': l'IDF lo mappa su
+// "ANY_LOW" e avvisa a ogni compilazione. Con un pin solo i due coincidono,
+// quindi il comportamento non cambia: sparisce l'avviso.
+#if CONFIG_IDF_TARGET_ESP32
+static constexpr esp_sleep_ext1_wakeup_mode_t BOX_EXT1_BASSO = ESP_EXT1_WAKEUP_ALL_LOW;
+#else
+static constexpr esp_sleep_ext1_wakeup_mode_t BOX_EXT1_BASSO = ESP_EXT1_WAKEUP_ANY_LOW;
+#endif
+
 void Rfid_EnableLpcd(void);
 void RfidPn5180_WakeupCheck(void);
 bool enabledLpcdShutdown = false; // Indicates if LPCD should be activated as part of the shutdown-process
@@ -585,7 +594,7 @@ void Rfid_EnableLpcd(void) {
 		Log_Println("switch to low power card detection: success", LOGLEVEL_NOTICE);
 	// configure wakeup pin for deep-sleep wake-up, use ext1. For a real GPIO only, not PE
 	#if (RFID_IRQ >= 0 && RFID_IRQ <= MAX_GPIO)
-		if (ESP_ERR_INVALID_ARG == esp_sleep_enable_ext1_wakeup((1ULL << (RFID_IRQ)), ESP_EXT1_WAKEUP_ALL_LOW)) {
+		if (ESP_ERR_INVALID_ARG == esp_sleep_enable_ext1_wakeup((1ULL << (RFID_IRQ)), BOX_EXT1_BASSO)) {
 			Log_Printf(LOGLEVEL_ERROR, wrongWakeUpGpio, RFID_IRQ);
 		}
 	#endif
@@ -669,7 +678,7 @@ void RfidPn5180_WakeupCheck(void) {
 	// configure wakeup pin for deep-sleep wake-up, use ext1
 	#if (RFID_IRQ >= 0 && RFID_IRQ <= MAX_GPIO)
 			// configure wakeup pin for deep-sleep wakeup, use ext1. For a real GPIO only, not PE
-			esp_sleep_enable_ext1_wakeup((1ULL << (RFID_IRQ)), ESP_EXT1_WAKEUP_ALL_LOW);
+			esp_sleep_enable_ext1_wakeup((1ULL << (RFID_IRQ)), BOX_EXT1_BASSO);
 	#endif
 	#if (defined(PORT_EXPANDER_ENABLE) && (RFID_IRQ > 99))
 			// reset IRQ state on port-expander

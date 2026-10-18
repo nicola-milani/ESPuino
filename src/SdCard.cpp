@@ -22,6 +22,21 @@ SanitizedFS gFSystem(HARDWARE_FS);
 
 uint8_t maxRecursionDepth;
 
+#ifdef SD_MMC_1BIT_MODE
+// [BOX] Sull'ESP32-S3 i pin di SD_MMC passano dalla matrice GPIO e vanno
+// dichiarati: il core Arduino non ne assegna nessuno per questa scheda, e
+// senza setPins() la microSD non si monta. Sull'ESP32 classico i pin sono
+// fissi (14/15/2) e qui non cambia niente.
+static void boxPreparaSdMmc(void) {
+	#if defined(BOX_SD_CLK) && defined(BOX_SD_CMD) && defined(BOX_SD_D0)
+	SD_MMC.setPins(BOX_SD_CLK, BOX_SD_CMD, BOX_SD_D0);
+	pinMode(BOX_SD_D0, INPUT_PULLUP);
+	#else
+	boxPreparaSdMmc(); // [BOX]
+	#endif
+}
+#endif
+
 void SdCard_Init(void) {
 #ifdef NO_SDCARD
 	// Initialize without any SD card, e.g. for webplayer only
@@ -31,7 +46,7 @@ void SdCard_Init(void) {
 
 #ifndef SINGLE_SPI_ENABLE
 	#ifdef SD_MMC_1BIT_MODE
-	pinMode(2, INPUT_PULLUP);
+	boxPreparaSdMmc(); // [BOX]
 	while (!SD_MMC.begin("/sdcard", true)) {
 	#else
 	pinMode(SPISD_CS, OUTPUT);
@@ -42,7 +57,7 @@ void SdCard_Init(void) {
 	#endif
 #else
 	#ifdef SD_MMC_1BIT_MODE
-	pinMode(2, INPUT_PULLUP);
+	boxPreparaSdMmc(); // [BOX]
 	while (!SD_MMC.begin("/sdcard", true)) {
 	#else
 	while (!SD.begin(SPISD_CS)) {

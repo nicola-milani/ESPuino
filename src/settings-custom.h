@@ -15,11 +15,14 @@
     #define __ESPUINO_SETTINGS_CUSTOM_H__
     #include "Arduino.h"
 
-    // ---------------- microSD ----------------
-    // In SD_MMC 1 bit ESPuino non chiama SD_MMC.setPins(): usa i pin di
-    // default del core Arduino. Su ESP32-S3 vanno verificati alla prima
-    // accensione (vedi "punto aperto" in firmware/config/impostazioni-box.md):
-    // o si adottano quei pin, o serve una riga setPins() in SdCard.cpp.
+    // ---------------- microSD (SD_MMC 1 bit) ----------------
+    // Sull'ESP32-S3 i pin di SD_MMC passano dalla matrice GPIO e il core
+    // Arduino non ne assegna nessuno per la variante esp32s3: senza una
+    // SD_MMC.setPins() la scheda non si monta e basta. Questi tre nomi
+    // sono nostri e li legge SdCard.cpp (modifica marcata [BOX]).
+    #define BOX_SD_CLK                      39
+    #define BOX_SD_CMD                      38
+    #define BOX_SD_D0                       40
 
     // ---------------- lettore NFC PN5180 (SPI dedicato) ----------------
     #define RST_PIN                         99          // dummy, richiesto da ESPuino
