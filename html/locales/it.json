@@ -1,0 +1,740 @@
+{
+	"restart": "Riavvia",
+	"reset": "Reimposta",
+	"execute": "Esegui",
+	"title": "ESPuino",
+	"shutdown": "Spegni",
+	"log": "Log",
+	"info": "Informazioni",
+	"delete": "Elimina",
+	"cancel": "Annulla",
+	"refresh": "Aggiorna",
+	"ok": "OK",
+	"infos": "Informazioni",
+	"darkmode": "Tema scuro",
+	"restartinfo": "ESPuino si sta riavviando...<br>La pagina si ricarica da sola a riavvio finito.",
+	"shutdowninfo": "ESPuino si sta spegnendo...<br>La pagina si ricarica da sola quando ESPuino viene riacceso.",
+	"toast": {
+		"rfidDetect": "Rilevato il tag RFID {{rfidId}}.",
+		"success": "Operazione eseguita.",
+		"dropout": "Flusso lento: sono possibili interruzioni.",
+		"saved": "Impostazioni salvate.",
+		"ledCountRestart": "Il numero di LED è cambiato. ESPuino si riavvia per applicarlo.",
+		"settingsInvalid": "Impossibile salvare: correggi prima queste impostazioni ({{fields}})."
+	},
+	"status": {
+		"connected": "Collegamento a ESPuino: OK",
+		"disconnected": "Collegamento a ESPuino perso: nuovo tentativo in corso..."
+	},
+	"nav": {
+		"control": "Comandi",
+		"rfid": "RFID",
+		"wifi": "WiFi",
+		"mqtt": "MQTT",
+		"ftp": "FTP",
+		"bluetooth": "Bluetooth",
+		"general": "Generale",
+		"updates": "Aggiornamenti",
+		"tools": "Strumenti",
+		"mediahub": "MediaHub",
+		"help": "Aiuto"
+	},
+	"settingsex": {
+		"led": {
+			"title": "Impostazioni dei LED",
+			"hueTitle": "Impostazioni dei colori",
+			"numindicator": "Numero di LED indicatori",
+			"numcontrol": "Numero di LED di controllo",
+			"controlled": "LED di controllo",
+			"numidledots": "Numero di LED a riposo",
+			"offsetpause": "Centra i LED della pausa",
+			"huestart": "Tinta iniziale dell'avanzamento",
+			"hueend": "Tinta finale dell'avanzamento",
+			"hueatmo": "Tinta della luce d'ambiente",
+			"satatmo": "Saturazione della luce d'ambiente",
+			"dimmablestates": "Passi di regolazione",
+			"reverserotation": "Inverti il senso di rotazione",
+			"offset": "Scostamento del primo LED",
+			"numindicatorExp": "Numero di LED usati per indicare stato e avanzamento (per esempio volume e progressione del brano). La modifica ha effetto dopo un riavvio.",
+			"numcontrolExp": "Numero di LED aggiuntivi in fondo alla catena, a ognuno dei quali si può assegnare un colore scelto liberamente. La modifica ha effetto dopo un riavvio.",
+			"numidledotsExp": "Numero di punti luminosi mostrati a riposo, quando non c'è riproduzione.",
+			"huestartExp": "Tinta (0-255) all'inizio dell'indicatore di avanzamento. -1 = usa il colore predefinito.",
+			"hueendExp": "Tinta (0-255) alla fine dell'indicatore di avanzamento. -1 = usa il colore predefinito.",
+			"hueatmoExp": "Tinta (0-255) in modalità luce d'ambiente. -1 = usa il colore predefinito.",
+			"satatmoExp": "Saturazione (0-255) in modalità luce d'ambiente. -1 = usa il valore predefinito.",
+			"dimmablestatesExp": "Numero di passaggi intermedi per LED: servono a rendere più morbide le transizioni, per esempio del volume o dell'avanzamento.",
+			"offsetExp": "Sposta di altrettante posizioni il primo LED dell'indicatore: utile se l'anello di LED non deve partire dalla posizione 0.",
+			"offsetpauseExp": "Sfalsa di mezzo LED l'indicatore di pausa rispetto a quello di riposo, così la pausa si distingue a colpo d'occhio.",
+			"reverserotationExp": "Inverte il verso in cui scorre l'indicatore luminoso, per esempio negli anelli montati in senso antiorario.",
+			"rfidflash": "Lampeggia brevemente quando riconosce un tag",
+			"rfidflashExp": "Conferma un tag RFID già associato con un breve lampo verde, così si vede che è stato accettato. Un tag sconosciuto viene comunque segnalato in rosso."
+		},
+		"buttons": {
+			"title": "Azioni dei tasti",
+			"titleExp": "Assegna a ogni tasto un'azione per la pressione breve e una per quella lunga.",
+			"short": "pressione breve",
+			"long": "pressione lunga",
+			"noaction": "--",
+			"button0": "Tasto avanti (Btn0)",
+			"button1": "Tasto indietro (Btn1)",
+			"button2": "Tasto play/pausa (Btn2)",
+			"button3": "Tasto dell'encoder (Btn3)",
+			"button4": "Tasto Btn4",
+			"button5": "Tasto Btn5"
+		},
+		"multibuttons": {
+			"title": "Azioni con due tasti",
+			"titleExp": "Esegue un'azione quando due tasti vengono premuti insieme.",
+			"01": "0+1 (avanti + indietro)",
+			"02": "0+2 (avanti + play/pausa)",
+			"03": "0+3 (avanti + encoder)",
+			"04": "0+4 (avanti + Btn4)",
+			"05": "0+5 (avanti + Btn5)",
+			"12": "1+2 (indietro + play/pausa)",
+			"13": "1+3 (indietro + encoder)",
+			"14": "1+4 (indietro + Btn4)",
+			"15": "1+5 (indietro + Btn5)",
+			"23": "2+3 (play/pausa + encoder)",
+			"24": "2+4 (play/pausa + Btn4)",
+			"25": "2+5 (play/pausa + Btn5)",
+			"34": "3+4 (encoder + Btn4)",
+			"35": "3+5 (encoder + Btn5)",
+			"45": "4+5 (Btn4 + Btn5)"
+		},
+		"rotary": {
+			"title": "Encoder rotativo",
+			"reverse": "Inverti il senso di rotazione",
+			"reverseExp": "Inverte il verso di conteggio dell'encoder, per esempio se alzare e abbassare il volume risultano scambiati.",
+			"gestures": "Tieni premuto un tasto e ruota",
+			"gesturesExp": "Mentre uno di questi tasti è premuto, ruotare l'encoder esegue l'azione assegnata invece di cambiare il volume. «Ruota a destra» è il verso che alza il volume. L'azione di pressione lunga di quel tasto scatta al rilascio, e non scatta affatto se l'encoder è stato ruotato.",
+			"ccw": "ruota a sinistra",
+			"cw": "ruota a destra",
+			"seekPreviewTitle": "Ricerca con l'encoder",
+			"seekPreviewTitleExp": "Regolazione fine della ricerca con l'encoder: l'anteprima 🎯 (vedi la tabella sopra) e la ricerca diretta quando a una rotazione è assegnato «avanza» o «torna indietro».",
+			"seekPrevDelay": "Attesa prima di confermare [ms]",
+			"seekPrevDelayExp": "Quanti millisecondi l'encoder deve restare fermo prima che l'anteprima 🎯 salti da sola al punto scelto. Rilasciando il tasto la conferma è comunque immediata, indipendentemente da questo valore. Da 0 a 3000, predefinito 2000.",
+			"seekPrevSweep": "Scatti per l'intero brano",
+			"seekPrevSweepExp": "Quanti scatti dell'encoder portano l'anteprima dallo 0% al 100% del brano (LED blu). Meno scatti = ricerca più rapida e grossolana, più scatti = controllo più fine. Predefinito 40.",
+			"rotSeekStep": "Salto per scatto [s]",
+			"rotSeekStepExp": "Di quanti secondi salta ogni scatto quando a una rotazione è assegnata direttamente la ricerca avanti o indietro (non l'anteprima). Tienilo basso: un colpo di polso vale molti scatti. Da 1 a 60, predefinito 10.",
+			"directSeekTitle": "Ricerca diretta",
+			"directSeekHint": "La versione semplice: ogni scatto salta subito avanti o indietro della quantità impostata, senza anteprima e senza attese. È più immediata ma anche più grossolana, perché un colpo di polso vale molti scatti e si finisce lontani. In compenso funziona anche su un ESPuino senza Neopixel, dove un'anteprima non avrebbe nulla da mostrare. È così che l'encoder è configurato di partenza. Vale quando qui sopra assegni «avanza» o «torna indietro» a una rotazione.",
+			"previewSeekTitle": "Anteprima della ricerca",
+			"previewSeekHint": "La versione più comoda, e la scelta migliore per quasi tutti. Appena tieni premuto il tasto assegnato l'anello di LED diventa giallo, ancora prima che tu cominci a ruotare: è il segno che l'anteprima è attiva. Ruotando, la riproduzione non si muove: si sposta soltanto un indicatore blu sul punto in cui si salterebbe (se hai un solo LED invece di un anello, resta semplicemente acceso blu durante l'anteprima). Il salto avviene quando rilasci il tasto o smetti di ruotare per un momento. Così puoi prendere la mira con calma e vedere dove stai andando, invece di cercare il punto a tentoni. I due valori qui sotto stabiliscono quanto ESPuino aspetta dopo l'ultima rotazione e quanti scatti servono per percorrere tutto il brano. Vale quando qui sopra assegni «anteprima della ricerca» a una rotazione."
+		},
+		"seek": {
+			"title": "Ricerca con i tasti",
+			"titleExp": "Passo di ricerca per le azioni «avanza» e «torna indietro» assegnate ai tasti.",
+			"jumpOffset": "Salto per pressione [s]",
+			"jumpOffsetExp": "Di quanti secondi salta dentro il brano una pressione di «avanza» o «torna indietro». Ha effetto subito dopo il salvataggio. Da 1 a 120, predefinito 30."
+		}
+	},
+	"wifi": {
+		"title": "Configurazione del WiFi",
+		"saveButton": "Salva le impostazioni WiFi",
+		"addNetworkButton": "Aggiungi rete",
+		"networks": "Reti",
+		"savedNetworks": "Reti salvate",
+		"ssid": {
+			"title": "Nome della rete (SSID)",
+			"placeholder": "SSID",
+			"validation": "Inserisci l'SSID della rete WiFi",
+			"explanation": "Nome della rete WiFi a cui ESPuino deve collegarsi."
+		},
+		"password": {
+			"title": "Password",
+			"placeholder": "Password",
+			"validation": "Inserisci la password della rete WiFi",
+			"explanation": "Password della rete WiFi a cui ESPuino deve collegarsi."
+		},
+		"hostname": {
+			"title": "Nome di ESPuino (hostname)",
+			"placeholder": "espuino",
+			"validation": "Inserisci un hostname valido",
+			"explanation": "È il nome con cui ESPuino si presenta sulla tua rete."
+		},
+		"apSSID": {
+			"title": "Nome della rete creata da ESPuino",
+			"placeholder": "ESPuino",
+			"explanation": "Nome della rete WiFi che ESPuino apre quando non è ancora stato configurato nessun WiFi, oppure nessuna rete configurata è a portata."
+		},
+		"apPassword": {
+			"title": "Password della rete creata da ESPuino",
+			"placeholder": "Password",
+			"explanation": "Password della rete WiFi che ESPuino apre quando non è ancora stato configurato nessun WiFi, oppure nessuna rete configurata è a portata."
+		},
+		"apTimeout": {
+			"title": "La rete si chiude dopo (minuti)",
+			"hint": "0 = la rete non si chiude mai da sola (rischio per la sicurezza!)",
+			"explanation": "Per quanti minuti resta aperta la rete WiFi che ESPuino crea quando non è ancora stato configurato nessun WiFi, oppure nessuna rete configurata è a portata."
+		},
+		"static": {
+			"addr": "Indirizzo IP statico",
+			"enabled": "Configurazione IP statica",
+			"gateway": "Gateway per la configurazione IP statica",
+			"subnet": "Maschera di sottorete per la configurazione IP statica",
+			"dns1": "DNS 1 per la configurazione IP statica",
+			"dns2": "DNS 2 per la configurazione IP statica",
+			"explanation": "L'indirizzo IP viene impostato a mano invece che da un server DHCP. Attenzione: bisogna sapere cosa si scrive, altrimenti ESPuino potrebbe non essere più raggiungibile in rete.",
+			"addrExp": "Indirizzo IPv4 fisso di ESPuino sulla rete WiFi (vale solo se la configurazione IP statica è attiva).",
+			"gatewayExp": "Indirizzo IP del gateway o del router per la configurazione IP statica.",
+			"subnetExp": "Maschera di sottorete per la configurazione IP statica, per esempio 255.255.255.0.",
+			"dns1Exp": "Server DNS preferito per la configurazione IP statica.",
+			"dns2Exp": "Server DNS alternativo per la configurazione IP statica, usato se il primo non risponde."
+		},
+		"scan": {
+			"enabled": "Collegati alla rete col segnale più forte",
+			"explanation": "Se in ESPuino sono configurate più reti WiFi, o se hai una rete mesh, ESPuino non si collega alla prima rete configurata che trova: le passa in rassegna tutte e sceglie quella col segnale migliore. Vantaggio: più velocità. Svantaggio: ci mette un po' di più."
+		},
+		"delete": {
+			"title": "Elimina rete WiFi",
+			"prompt": "Vuoi eliminare la rete salvata «{{ssid}}»?"
+		},
+		"restartPrompt": "Tutto pronto?",
+		"fullInterface": {
+			"title": "Ti serve solo l'interfaccia?",
+			"hint": "Se non vuoi configurare il WiFi ma solo usare l'interfaccia (per esempio fuori casa, dove non ci sono reti conosciute): chiudi questa finestra, apri il tuo browser e vai a questo indirizzo.",
+			"copy": "Copia l'indirizzo",
+			"copied": "Indirizzo copiato!",
+			"copyFailed": "Non sono riuscito a copiarlo: seleziona e copia l'indirizzo qui sopra a mano."
+		},
+		"fail": {
+			"wrong_password": "Non sono riuscito a collegarmi a «{{ssid}}»: probabilmente la password è sbagliata (codice {{code}}). Controllala e riprova.",
+			"not_found": "La rete «{{ssid}}» non è stata trovata (codice {{code}}). È a portata e a 2,4 GHz?",
+			"rejected": "Il router ha rifiutato il collegamento a «{{ssid}}» (codice {{code}}). Controlla il filtro MAC, il numero massimo di dispositivi e le impostazioni di sicurezza (serve WPA2).",
+			"other": "Collegamento a «{{ssid}}» non riuscito (codice {{code}}).",
+			"timeout": "Collegato a «{{ssid}}», ma non è arrivato nessun indirizzo IP (codice {{code}}). Controlla il DHCP del router."
+		},
+		"test": {
+			"connecting": "Provo a collegarmi a «{{ssid}}» …",
+			"connectingBtn": "Collegamento …",
+			"success": "Collegato! Il box ha preso l'indirizzo {{ip}}. Ora esce dalla modalità di configurazione: rimetti il telefono sul WiFi di casa e raggiungi il box su http://{{ip}}",
+			"reachTitle": "Come raggiungere ESPuino",
+			"reachHint": "Adesso ESPuino è sulla tua rete a questo indirizzo. Copialo o salvalo tra i preferiti: la rete di configurazione sta per chiudersi."
+		}
+	},
+	"control": {
+		"title": "Comandi",
+		"first": "Primo",
+		"prev": "Precedente",
+		"playpause": "Play / Pausa",
+		"forward": "Successivo",
+		"last": "Ultimo",
+		"volume": "Volume",
+		"voldown": "Abbassa il volume",
+		"volup": "Alza il volume",
+		"current": "Brano in riproduzione",
+		"command": "Esegui la modifica"
+	},
+	"files": {
+		"title": "File",
+		"loading": "Attendi...",
+		"storage": {
+			"title": "Spazio",
+			"loading": "Calcolo dello spazio in corso...",
+			"usage": "{{used}} di {{total}} usati · {{free}} liberi",
+			"unavailable": "Nessuna scheda SD",
+			"statsUnavailable": "Scheda SD rilevata, ma non è stato possibile determinarne la capacità",
+			"error": "Non è stato possibile leggere lo spazio occupato"
+		},
+		"context": {
+			"newFolder": "Nuova cartella",
+			"play": "Riproduci",
+			"refresh": "Aggiorna",
+			"delete": "Elimina",
+			"rename": "Rinomina",
+			"download": "Scarica",
+			"useAsBatteryWarning": "Usa come avviso di batteria scarica",
+			"useAsBatteryWarningDone": "Impostato come avviso di batteria scarica"
+		},
+		"files": {
+			"title": "File",
+			"desc": "Carica uno o più file"
+		},
+		"directory": {
+			"title": "Cartella",
+			"desc": "Carica una cartella con tutti i file e le sottocartelle"
+		},
+		"search": {
+			"placeholder": "Cerca file..."
+		},
+		"upload": {
+			"title": "Caricamento",
+			"desc": "Avvia il caricamento",
+			"selectFolder": "Scegli la cartella di destinazione!",
+			"selectFile": "Scegli i file o le cartelle da caricare!",
+			"success": "Caricamento riuscito ({{elapsed}}, {{speed}} KB/s)",
+			"error": "Errore nel caricamento",
+			"timeCalc": "Sto calcolando il tempo rimanente...",
+			"minutes_one": "minuto",
+			"minutes_other": "minuti",
+			"seconds": "secondi",
+			"fewSec": "pochi",
+			"progress": "{{percent}}% ({{speed}} KB/s), mancano {{remaining.value}} {{remaining.unit}}..."
+		},
+		"rfid": {
+			"title": "Associazioni RFID",
+			"saveButton": "Salva l'associazione",
+			"idNumber": "Numero RFID (12 cifre) oppure <a href=\"https://forum.espuino.de/t/virtual-rfid-cards\" target=\"_blank\">virtuale</a>",
+			"music": "Musica",
+			"modification": "Modifica",
+			"fileurl": {
+				"title": "File, cartella o URL (^ e # non sono ammessi)",
+				"placeholder": "per esempio /mp3/Audiolibri/Yakari/Yakari_e_gli_amici.mp3"
+			},
+			"playmode": {
+				"title": "Modalità di riproduzione",
+				"placeholder": "Scegli la modalità",
+				"mode": {
+					"1": "🎵 Brano singolo",
+					"2": "🎵🔁 Brano singolo (in loop)",
+					"12": "🎲💤 Un brano a caso dalla cartella, poi spegnimento.",
+					"3": "📖 Audiolibro",
+					"16": "📚 Audiolibro con sottocartelle (ricorsivo)",
+					"4": "📖🔁 Audiolibro (in loop)",
+					"5": "📁 Tutti i brani della cartella (in ordine)",
+					"15": "🌳 Tutti i brani della cartella e delle sottocartelle (in ordine, ricorsivo)",
+					"6": "📁🔀 Tutti i brani della cartella (a caso)",
+					"17": "🌳🔀 Tutti i brani della cartella e delle sottocartelle (a caso, ricorsivo)",
+					"7": "📁🔁 Tutti i brani della cartella (in ordine, in loop)",
+					"9": "📁🔀🔁 Tutti i brani della cartella (a caso, in loop)",
+					"13": "🎲📁 Tutti i brani di una sottocartella a caso (in ordine)",
+					"14": "🎲📁🔀 Tutti i brani di una sottocartella a caso (a caso)",
+					"8": "📻 Webradio",
+					"11": "📃 Elenco (file dalla SD e/o flussi web) da un file .m3u locale",
+					"18": "🌐 MediaHub (contenuto e modalità arrivano dal media server scelto)"
+				},
+				"error": "Modalità di riproduzione non valida"
+			},
+			"mediahub": {
+				"serverSelect": {
+					"title": "Media server"
+				},
+				"name": {
+					"title": "Nome visualizzato",
+					"explanation": "Nome a piacere con cui questo media server compare nell'elenco."
+				},
+				"hostPort": {
+					"title": "Indirizzo",
+					"explanation": "Indirizzo e porta del server MediaHub, per esempio 192.168.1.50:8080.",
+					"placeholder": "per esempio 192.168.1.50:8080"
+				},
+				"addButton": "Salva il media server",
+				"openButton": "Apri MediaHub",
+				"delete": {
+					"title": "Eliminare il media server?",
+					"prompt": "Vuoi davvero eliminare il media server «{{name}}»? I tag già associati restano come sono."
+				}
+			},
+			"mod": {
+				"title": "Modifica",
+				"placeholder": "Scegli una modifica",
+				"cmd": {
+					"100": "🔒 Blocco dei comandi",
+					"101": "💤 Spegnimento dopo 15 minuti",
+					"102": "💤 Spegnimento dopo 30 minuti",
+					"103": "💤 Spegnimento dopo 1 ora",
+					"104": "💤 Spegnimento dopo 2 ore",
+					"105": "💤 Spegnimento a fine brano",
+					"106": "💤 Spegnimento a fine scaletta",
+					"107": "💤 Spegnimento dopo cinque brani",
+					"110": "🔁 Ripeti la scaletta",
+					"111": "🔂 Ripeti il brano",
+					"120": "🌙 Abbassa i LED (modalità notte)",
+					"130": "📶 Accendi o spegni il WiFi",
+					"140": "🔊 Attiva o disattiva l'altoparlante Bluetooth",
+					"141": "🎧 Attiva o disattiva le cuffie Bluetooth",
+					"142": "🔀 Cambia modalità (normale => altoparlante BT => cuffie BT)",
+					"150": "📁 Attiva l'FTP",
+					"151": "🌐 Annuncia l'indirizzo IP",
+					"152": "🕒 Annuncia l'ora",
+					"153": "💡 Accendi o spegni la luce d'ambiente",
+					"154": "🔆 Alza la luminosità dei LED",
+					"155": "🔅 Abbassa la luminosità dei LED",
+					"0": "🗑 Togli l'associazione",
+					"170": "⏯ Play o pausa",
+					"171": "⏮ Brano precedente",
+					"172": "⏭ Brano successivo",
+					"173": "⏪ Primo brano",
+					"174": "⏩ Ultimo brano",
+					"175": "🔈 Volume iniziale",
+					"176": "🔊 Alza il volume",
+					"177": "🔉 Abbassa il volume",
+					"178": "🔋 Mostra la tensione della batteria",
+					"179": "💤 Spegni subito",
+					"180": "» Avanza (n secondi)",
+					"181": "« Torna indietro (n secondi)",
+					"182": "⏹ Ferma",
+					"183": "🔄 Riavvia",
+					"184": "📁 Vai alla cartella successiva",
+					"185": "📁 Vai alla cartella precedente",
+					"186": "🎯 Anteprima della ricerca (ruota per spostarti, conferma al rilascio)",
+					"199": "📊 Mostra il carico dei task (console)",
+					"241": "🏷 Riproduci il tag RFID virtuale 01",
+					"242": "🏷 Riproduci il tag RFID virtuale 02",
+					"243": "🏷 Riproduci il tag RFID virtuale 03",
+					"244": "🏷 Riproduci il tag RFID virtuale 04",
+					"245": "🏷 Riproduci il tag RFID virtuale 05",
+					"246": "🏷 Riproduci il tag RFID virtuale 06",
+					"247": "🏷 Riproduci il tag RFID virtuale 07",
+					"248": "🏷 Riproduci il tag RFID virtuale 08",
+					"249": "🏷 Riproduci il tag RFID virtuale 09",
+					"250": "🏷 Riproduci il tag RFID virtuale 10"
+				}
+			}
+		}
+	},
+	"mqtt": {
+		"title": "Impostazioni MQTT",
+		"saveButton": "Salva le impostazioni MQTT",
+		"enable": "Attiva MQTT",
+		"clientId": {
+			"title": "ClientId MQTT",
+			"placeholder": "per esempio ESPuino-<MAC>",
+			"validation": "",
+			"explanation": "Identificativo con cui ESPuino si presenta al broker MQTT: dev'essere unico sulla rete. Il segnaposto &lt;MAC&gt; viene sostituito dall'indirizzo MAC."
+		},
+		"server": {
+			"title": "Server MQTT",
+			"placeholder": "per esempio 192.168.2.89",
+			"validation": "",
+			"explanation": "Nome o indirizzo IP del broker MQTT."
+		},
+		"baseTopic": {
+			"title": "Topic di base (facoltativo)",
+			"placeholder": "per esempio home/espuino",
+			"validation": "",
+			"explanation": "Percorso sotto cui vengono pubblicati tutti i topic MQTT di ESPuino, per esempio «espuino/soggiorno/...»."
+		},
+		"deviceId": {
+			"title": "Id del dispositivo",
+			"placeholder": "per esempio ESPuino-<MAC>",
+			"validation": "",
+			"explanation": "Identificativo del dispositivo che fa parte del percorso dei topic MQTT: serve a distinguere più ESPuino sullo stesso broker. Il segnaposto &lt;MAC&gt; viene sostituito dall'indirizzo MAC."
+		},
+		"topicsPreview": "Topic completi (anteprima)",
+		"restartNote": "Nota: le impostazioni MQTT hanno effetto solo dopo un riavvio.",
+		"restartPrompt": "Impostazioni MQTT salvate. Vuoi riavviare adesso per applicarle?",
+		"topics": {
+			"preview": "Topic completi (anteprima)"
+		},
+		"user": {
+			"title": "Utente MQTT (facoltativo)",
+			"placeholder": "utente",
+			"validation": "",
+			"explanation": "Nome utente per accedere al broker MQTT, se richiede l'autenticazione."
+		},
+		"pwd": {
+			"title": "Password MQTT (facoltativa)",
+			"placeholder": "password",
+			"validation": "",
+			"explanation": "Password per accedere al broker MQTT, se richiede l'autenticazione."
+		},
+		"port": {
+			"title": "Porta MQTT",
+			"placeholder": "per esempio 1883",
+			"validation": "",
+			"explanation": "Porta TCP del broker MQTT (predefinita: 1883 per i collegamenti non cifrati)."
+		},
+		"enableExp": "Attiva il collegamento a un broker MQTT. La modifica ha effetto dopo un riavvio."
+	},
+	"ftp": {
+		"title": "Impostazioni FTP",
+		"saveButton": "Salva le impostazioni FTP",
+		"user": {
+			"title": "Utente FTP",
+			"placeholder": "utente",
+			"explanation": "Nome utente per accedere a ESPuino via FTP."
+		},
+		"pwd": {
+			"title": "Password FTP",
+			"placeholder": "password",
+			"explanation": "Password per accedere a ESPuino via FTP."
+		},
+		"start": {
+			"title": "Avvia il server FTP",
+			"desc": "Attiva il server FTP fino al prossimo riavvio.",
+			"button": "Avvia il server FTP"
+		}
+	},
+	"bt": {
+		"saveButton": "Salva le impostazioni Bluetooth",
+		"normal": {
+			"title": "Esci dalla modalità Bluetooth",
+			"desc": "Torna alla modalità normale con il WiFi attivo. Si possono riprodurre la musica dalla scheda SD e i flussi web.",
+			"button": "Esci dalla modalità Bluetooth",
+			"indicator": "Modalità WiFi (RSSI: {{rssi}} dBm)"
+		},
+		"sink": {
+			"title": "ESPuino come altoparlante Bluetooth",
+			"desc": "ESPuino si avvia come altoparlante Bluetooth.",
+			"button": "Avvia come altoparlante Bluetooth",
+			"indicator": "Modalità altoparlante Bluetooth"
+		},
+		"source": {
+			"configtitle": "Impostazioni delle cuffie Bluetooth",
+			"title": "Collegati a cuffie Bluetooth",
+			"desc": "Il dispositivo si collega alle cuffie Bluetooth indicate.",
+			"button": "Avvia in modalità cuffie",
+			"indicator": "Modalità cuffie Bluetooth"
+		},
+		"scan": {
+			"title": "Cerca dispositivi",
+			"button": "Cerca",
+			"connect": "Collega",
+			"save": "Salva il dispositivo",
+			"inProgress": "Ricerca dei dispositivi in corso...",
+			"noDevices": "Nessun dispositivo Bluetooth trovato",
+			"notAllowed": "La ricerca dei dispositivi Bluetooth non è possibile in questa modalità. Passa prima alla modalità cuffie Bluetooth.",
+			"unknownDevice": "Dispositivo sconosciuto",
+			"connecting": "Collegamento a {{device}} in corso..."
+		},
+		"device": {
+			"title": "Dispositivo Bluetooth (cuffie)",
+			"placeholder": "per esempio Le mie cuffie senza fili",
+			"explanation": "Nome con cui ESPuino si presenta durante l'associazione Bluetooth, o che usa per collegarsi a delle cuffie Bluetooth."
+		},
+		"pincode": {
+			"title": "PIN di associazione",
+			"placeholder": "per esempio 0000",
+			"explanation": "Codice PIN per l'associazione Bluetooth (serve solo se il dispositivo lo chiede)."
+		},
+		"switchmode": {
+			"title": "Modalità Bluetooth attiva",
+			"prompt": "In modalità Bluetooth i comandi dal sito sono limitati. Vuoi tornare alla modalità WiFi e riavviare?",
+			"button": "Passa alla modalità WiFi"
+		},
+		"mode": {
+			"title": "Modalità Bluetooth",
+			"off": "Spenta",
+			"headphones": "Cuffie",
+			"speaker": "Altoparlante",
+			"restartNotice": "Scegliere una modalità diversa riavvia ESPuino."
+		},
+		"connection": {
+			"connected": "Collegato a: {{device}}",
+			"disconnected": "Non collegato"
+		}
+	},
+	"general": {
+		"saveButton": "Salva le impostazioni",
+		"language": "Lingua",
+		"volume": {
+			"title": "Volume",
+			"restart": "All'accensione",
+			"min": "Minimo",
+			"speakerMax": "Volume massimo (altoparlante)",
+			"headphoneMax": "Volume massimo (cuffie)",
+			"restartExp": "Volume con cui ESPuino parte all'accensione, a meno che non sia attivo «Ricorda l'ultimo volume».",
+			"minExp": "Volume più basso selezionabile. Impedisce di azzerare del tutto ESPuino, per esempio perché i bambini non lo rendano muto senza volere. Dev'essere più basso di entrambi i volumi massimi. Ha effetto dopo un riavvio.",
+			"speakerMaxExp": "Volume massimo consentito quando si ascolta dall'altoparlante.",
+			"headphoneMaxExp": "Volume massimo consentito quando si ascolta in cuffia."
+		},
+		"equalizer": {
+			"title": "Equalizzatore",
+			"gainLowPass": "Bassi (in dB)",
+			"gainBandPass": "Medi (in dB)",
+			"gainHighPass": "Alti (in dB)",
+			"info": "Secondo la libreria (ESP32-audioI2S) le frequenze sono 500 Hz LowShelf, 3000 Hz PeakEQ e 6000 Hz HighShelf."
+		},
+		"rfid": {
+			"title": "Lettore RFID",
+			"readerType": {
+				"title": "Tipo di lettore",
+				"auto": "Riconoscimento automatico",
+				"mfrc522_spi": "MFRC522 (SPI)",
+				"mfrc522_i2c": "MFRC522 (I2C)",
+				"pn5180": "PN5180",
+				"description": "Scegli il tipo di lettore RFID collegato al tuo ESPuino. Con il riconoscimento automatico prova a capirlo da solo."
+			},
+			"pn5180Lpcd": "Attiva l'LPCD del PN5180",
+			"pn5180LpcdExp": "Attiva il rilevamento a basso consumo (Low Power Card Detection) del lettore PN5180. Servono il firmware 4.0 o successivo del PN5180 e i ponticelli di saldatura configurati nel modo giusto. Altre informazioni <a href='https://forum.espuino.de/t/was-ist-lpcd-und-wie-funktioniert-es/1664' target='_blank'>qui</a>.",
+			"mfrc522Gain": "Guadagno dell'MFRC522",
+			"mfrc522GainExp": "Imposta la sensibilità del lettore MFRC522. I valori vanno da 0 (sensibilità minima) a 7 (massima). Predefinito 7.",
+			"mfrc522ScanInterval": "Intervallo di lettura dell'MFRC522",
+			"mfrc522ScanIntervalExp": "Millisecondi fra due letture del lettore MFRC522. La modifica ha effetto dopo un riavvio. Predefinito 100 ms.",
+			"pn5180Debounce": "Antirimbalzo del PN5180",
+			"pn5180DebounceExp": "Per quanti millisecondi un tag deve risultare assente prima di considerarlo tolto. Evita che una lettura che salta per un attimo, per esempio con il tag un po' distante, venga scambiata per una rimozione. La modifica ha effetto dopo un riavvio. Predefinito 500 ms.",
+			"slixPrivacyPassword": "Password privacy ICODE-SLIX2",
+			"slixPrivacyPasswordExp": "Password di quattro byte per disattivare la modalità privacy sui tag ICODE-SLIX2 protetti. Sono ammessi solo valori esadecimali da 00 a FF.",
+			"pn5180Firmware": "Versione del firmware del PN5180"
+		},
+		"options": {
+			"title": "Opzioni",
+			"playMono": "Riproduzione in mono",
+			"playMonoExp": "Con due altoparlanti si può ascoltare in stereo. Altre informazioni <a href='https://forum.espuino.de/t/stereo-ausgabe/341' target='_blank'>qui</a>.",
+			"savePlayPosShutdown": "Ricorda il punto di ascolto allo spegnimento",
+			"savePlayPosShutdownExp": "Quando il box viene spento, il punto di ascolto degli audiolibri viene salvato. Altre informazioni <a href='https://forum.espuino.de/t/welche-optionen-beim-kompilieren-gibt-es/120' target='_blank'>qui</a>, sotto <code>SAVE_PLAYPOS_BEFORE_SHUTDOWN</code>.",
+			"savePlayPosRfidChange": "Ricorda il punto di ascolto quando cambia il tag",
+			"savePlayPosRfidChangeExp": "Passando a un nuovo tag RFID, il punto di ascolto degli audiolibri viene salvato. Non vale per i tag di modifica. Altre informazioni <a href='https://forum.espuino.de/t/welche-optionen-beim-kompilieren-gibt-es/120' target='_blank'>qui</a>, sotto <code>SAVE_PLAYPOS_WHEN_RFID_CHANGE</code>.",
+			"savePlayPosInterval": "Salva da solo il punto degli audiolibri lunghi ogni",
+			"savePlayPosIntervalSecs": "secondi",
+			"savePlayPosIntervalExp": "Salva periodicamente nella memoria interna il punto di ascolto degli audiolibri lunghi (file da cinque minuti in su), così un'interruzione improvvisa (batteria scarica, spina staccata, blocco) fa perdere al massimo i secondi impostati invece di far ripartire il file da capo. Vale solo per le modalità audiolibro: i brani corti o già divisi vengono salvati a ogni cambio di traccia. Un intervallo più breve scrive più spesso nella memoria, quindi sono consigliati 30-60 secondi; scendere molto più in basso serve a poco e consuma la memoria.",
+			"pauseIfRfidRemoved": "Metti in pausa quando il tag viene tolto",
+			"pauseIfRfidRemovedExp": "La riproduzione va in pausa quando il tag RFID viene tolto.",
+			"dontAcceptRfidTwice": "Non accettare due volte lo stesso tag",
+			"dontAcceptRfidTwiceExp": "Lo stesso tag RFID non viene accettato due volte di fila. Non si può usare insieme a <em>Metti in pausa quando il tag viene tolto</em>.",
+			"resumeOnSameRfid": "Riprendi dalla pausa rimettendo lo stesso tag",
+			"resumeOnSameRfidExp": "Se la riproduzione è in pausa e viene rimesso lo stesso tag RFID, l'ascolto riprende. Ha effetto solo se è attivo <em>Non accettare due volte lo stesso tag</em>.",
+			"playLastRfidOnReboot": "Riprendi l'ultimo tag al riavvio",
+			"playLastRfidOnRebootExp": "Al riavvio riparte l'ultimo tag RFID usato.",
+			"pauseOnMinVolume": "Pausa al volume minimo",
+			"pauseOnMinVolumeExp": "La riproduzione va in pausa quando il volume arriva al minimo. Altre informazioni <a href='https://forum.espuino.de/t/lautstaerke-0-pause/1631' target='_blank'>qui</a>",
+			"nightVolumeLimit": "Limita il volume in modalità notte",
+			"nightVolumeLimitExp": "Quando si accende la modalità notte, il volume impostato in quel momento diventa un limite massimo temporaneo (più un gradino di margine): comodo quando ESPuino va a letto. Il limite cade quando la modalità notte finisce.",
+			"recoverVolBoot": "Riparti dall'ultimo volume",
+			"recoverVolBootExp": "Dopo un riavvio il box ricorda l'ultimo volume usato e lo reimposta da solo.",
+			"volumeCurve": "Gradini più fini ai volumi bassi",
+			"volumeCurveExp": "Usa una scala logaritmica per il volume. Aiuta se ai volumi bassi i gradini risultano troppo larghi."
+		},
+		"neopixel": {
+			"title": "Neopixel (luminosità)",
+			"restart": "All'accensione",
+			"nightmode": "In modalità notte",
+			"atmomode": "In modalità luce d'ambiente",
+			"restartExp": "Luminosità dei LED subito dopo l'accensione.",
+			"nightmodeExp": "Luminosità ridotta dei LED in modalità notte.",
+			"atmomodeExp": "Luminosità dei LED in modalità luce d'ambiente."
+		},
+		"sleep": {
+			"title": "Spegnimento automatico",
+			"inactivity": "Dopo n minuti di inattività",
+			"inactivityExp": "Minuti senza nessuna interazione dopo i quali ESPuino si spegne da solo (deep sleep)."
+		},
+		"battery": {
+			"title": "Batteria",
+			"lowWarning": "Avvisa sotto questa soglia (in volt)",
+			"lowCritical": "Tensione minima (in volt) indicata da un solo LED",
+			"criticalShutoff": "Sotto questa tensione (in volt) ESPuino si spegne",
+			"high": "Tensione (in volt) indicata da tutti i LED",
+			"offset": "Correzione della tensione misurata (in volt, ± in centesimi)",
+			"measureInterval": "Intervallo fra due misure (in minuti)",
+			"shutdownOnCritical": "Spegni da solo alla tensione critica",
+			"lowWarningExp": "Tensione sotto la quale scatta l'avviso luminoso di batteria scarica.",
+			"lowCriticalExp": "Tensione mostrata come 0% di carica (batteria vuota).",
+			"highExp": "Tensione mostrata come 100% di carica (batteria piena).",
+			"offsetExp": "Correzione fine della tensione misurata. Se il valore mostrato è diverso da quello del multimetro, scrivi qui la differenza, positiva o negativa. Predefinito per la Complete: -0,04 V.",
+			"criticalShutoffExp": "Tensione alla quale ESPuino si spegne da solo per proteggere la batteria dalla scarica profonda.",
+			"measureIntervalExp": "Ogni quanti minuti viene misurata la tensione della batteria.",
+			"shutdownOnCriticalExp": "Spegne ESPuino quando la tensione della batteria scende sotto la soglia critica impostata qui sotto. Aiuta a proteggere la batteria dalla scarica profonda, ma non sostituisce un sistema di gestione della batteria. Valori consigliati: LFP 2,7 V, LiPo 3,0 V.",
+			"warnSound": "Avvisa a voce quando la batteria è scarica",
+			"warnSoundExp": "Riproduce un file audio dalla scheda SD quando la batteria si sta scaricando: l'ascolto si interrompe un attimo e riprende esattamente dallo stesso punto. Serve perché i LED che lampeggiano sfuggono facilmente mentre si ascolta, e ai bambini sfuggono sempre.",
+			"warnSoundFile": "File dell'avviso",
+			"warnSoundFileExp": "Percorso del file audio sulla scheda SD. Il modo più semplice per sceglierlo è un clic destro nel browser dei file, «Usa come avviso di batteria scarica». Se il file manca non si interrompe nulla e viene solo registrato un errore.",
+			"warnSoundOnce": "Avvisa una volta sola",
+			"warnSoundOnceExp": "Senza questa opzione l'avviso si ripete a ogni misura finché la batteria resta sotto la soglia, quindi con la cadenza dell'intervallo impostato. Con questa opzione viene detto una volta sola, e torna a farsi sentire solo dopo che la tensione è risalita sopra la soglia e poi è scesa di nuovo."
+		},
+		"playlist": {
+			"title": "Scaletta",
+			"sortMode": "Ordinamento della scaletta e dei file",
+			"strcmp": "Ordinamento standard",
+			"strnatcmp": "Naturale: distingue maiuscole e minuscole",
+			"strnatcasecmp": "Naturale: non distingue maiuscole e minuscole",
+			"recDepth": "Profondità massima nelle scalette ricorsive",
+			"sortModeExp": "Stabilisce come vengono ordinati file e scalette: ordinamento alfabetico standard (dove «10» viene prima di «2») oppure ordinamento naturale, che mette i numeri nell'ordine giusto («2» prima di «10»), eventualmente distinguendo maiuscole e minuscole.",
+			"recDepthExp": "Quanti livelli di sottocartelle esplorare quando si creano scalette ricorsive."
+		},
+		"tabs": {
+			"playback": "Riproduzione",
+			"rfidReader": "Lettore RFID",
+			"encoderButtons": "Encoder e tasti",
+			"led": "LED",
+			"power": "Alimentazione"
+		}
+	},
+	"tools": {
+		"nvs": {
+			"title": "Associazioni RFID salvate",
+			"desc": "Le associazioni RFID non stanno sulla scheda SD ma nella memoria interna non volatile (NVS) di ESPuino.",
+			"list": {
+				"title": "Elenco di tutte le associazioni salvate",
+				"show": "Mostra le associazioni"
+			},
+			"erase": {
+				"title": "Cancella tutte le associazioni RFID",
+				"desc": "Importando un backup le voci nuove vengono aggiunte, ma quelle vecchie non vengono cancellate: solo se esiste già un'associazione per la stessa voce viene sovrascritta. Con questa funzione si cancellano tutte le associazioni esistenti.<br>Altre <a href=\"https://forum.espuino.de/t/die-backupfunktion-des-espuino/508\" target=\"_blank\">informazioni</a> (in tedesco).",
+				"button": "Cancella tutte le associazioni",
+				"prompt": "Vuoi cancellare tutte le associazioni RFID salvate?"
+			},
+			"delete": {
+				"title": "Cancella l'associazione RFID",
+				"prompt": "Vuoi togliere l'associazione «{{rfid}}»?"
+			},
+			"import": {
+				"title": "Importa",
+				"desc": "Qui si può caricare un file di backup per importare le associazioni RFID.",
+				"button": "Importa le associazioni"
+			},
+			"export": {
+				"title": "Esporta",
+				"desc": "Qui si può scaricare un file di backup con le associazioni RFID.",
+				"button": "Esporta le associazioni"
+			}
+		},
+		"fwupdate": {
+			"title": "Aggiornamento del firmware",
+			"button": "Carica il firmware",
+			"desc": "Il firmware si può aggiornare da qui.",
+			"github": {
+				"title": "Scarica il firmware da GitHub",
+				"desc": "Scarica un firmware già compilato dal repository ESPuino-Firmware e lo installa, senza doverlo scaricare a mano.",
+				"branch": "Ramo",
+				"checkButton": "Cerca aggiornamenti",
+				"searching": "Ricerca in corso…",
+				"noBuilds": "Nessuna versione trovata per questa scelta.",
+				"notAvailablePlatform": "Nel repository non ci sono firmware già compilati per questa scheda ({{platform}}). Carica il firmware a mano.",
+				"notAvailableCustomBuild": "Questa scheda è stata compilata con impostazioni personalizzate (settings-override.h / platformio-override.ini). Il firmware ufficiale non le contiene: compilalo tu e caricalo a mano come al solito.",
+				"notAvailableOta": "Questa scheda non supporta l'aggiornamento del firmware dall'interfaccia web. Scrivi il firmware via seriale.",
+				"buildEntry": "{{date}} – commit:",
+				"installButton": "Installa",
+				"installPrompt": "Vuoi installare adesso il firmware del {{date}} (commit {{commit}})?\n\nScheda: {{platform}}\nRamo: {{branch}}\nLingua: {{language}}\n\nIl nuovo firmware verrà installato sul tuo ESPuino. Ci vuole circa un minuto: se è collegata una striscia di Neopixel con più LED, durante l'attesa si vede un'animazione blu di avanzamento. Con un solo LED, lampeggia di blu.",
+				"fetchError": "Non è stato possibile scaricare l'elenco dei firmware."
+			}
+		}
+	},
+	"mediahub": {
+		"title": "MediaHub",
+		"intro": "MediaHub è un'aggiunta facoltativa, da installare a parte: un piccolo server locale che gira come container Docker sulla tua rete. Permette di gestire in un posto solo le associazioni dei tag RFID di più ESPuino: contenuto e modalità di riproduzione arrivano dal server invece che dalla memoria interna del box. Senza un server MediaHub attivo, questa pagina non serve a nulla. Qui si registrano gli indirizzi dei tuoi server MediaHub, così compaiono nell'elenco quando associ un tag. Il server MediaHub si trova su GitHub: <a href='https://github.com/biologist79/ESPuino-Mediahub' target='_blank'>github.com/biologist79/ESPuino-Mediahub</a>.",
+		"serversTitle": "Aggiungi un media server",
+		"registeredServersTitle": "Media server registrati"
+	},
+	"help": {
+		"forum": {
+			"title": "Forum",
+			"desc": "Hai problemi o vuoi scambiare due parole su ESPuino?<br /> Ci trovi sul <a href=\"https://forum.espuino.de\" target=\"_blank\">forum di ESPuino</a>, dove c'è anche molta <a href=\"https://forum.espuino.de/c/dokumentation/anleitungen/10\" target=\"_blank\">documentazione</a> (in tedesco)."
+		},
+		"swagger": {
+			"title": "Swagger",
+			"desc": "Documentazione dell'API REST: <a href=\"swagger.html\" target=\"_blank\">Swagger</a>."
+		}
+	},
+	"datetime": {
+		"day": "giorno",
+		"days": "giorni",
+		"hour": "ora",
+		"hours": "ore",
+		"minute": "minuto",
+		"minutes": "minuti",
+		"second": "secondo",
+		"seconds": "secondi"
+	},
+	"systeminfo": {
+		"title": "Informazioni",
+		"softwareversion": "ESPuino {{softwareversion}}",
+		"gitversion": "ESPuino {{gitversion}}",
+		"branch": "Ramo: {{branch}}",
+		"arduinoversion": "Versione di Arduino: {{arduinoversion}} (ESP-IDF {{idfversion}})",
+		"hardware": "Hardware: {{hwmodel}}, revisione {{hwrevision}}, CPU: {{hwfreq}} MHZ",
+		"freeheap": "Heap libero: {{freeheap}} byte",
+		"largestfreeblock": "Blocco di heap libero più grande: {{largestfreeblock}} byte",
+		"freepsram": "PS-RAM libera: {{freepsram}} byte",
+		"currentip": "Indirizzo IP attuale: {{currentip}}",
+		"macAddress": "Indirizzo MAC: {{macAddress}}",
+		"rssi": "Potenza del segnale WiFi: {{rssi}} dBm",
+		"audiotimetotal": "Ascolto totale dal {{firststart}}: {{audiotimetotal}}",
+		"audiotimesincestart": "Ascolto dall'ultima accensione: {{audiotimesincestart}}",
+		"currvoltage": "Tensione attuale della batteria: {{currvoltage}} V",
+		"chargelevel": "Livello di carica attuale: {{chargelevel}} %",
+		"hallsensor": "Sensore di Hall, valore a campo nullo: {{hsnullfieldvalue}}, attuale: {{hsactual}}, differenza: {{hsdiff}}, LastWaitFor_State: {{hslastwaitforstate}} (attesa: {{hswaited}} ms)"
+	}
+}
