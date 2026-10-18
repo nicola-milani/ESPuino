@@ -108,6 +108,7 @@ protected:
 };
 
 void Wlan_Init(void);
+void Wlan_ForceAccessPoint(void); // [BOX] modalita' configurazione (task 9)
 void Wlan_Cyclic(void);
 bool Wlan_AddNetworkSettings(const WiFiSettings &);
 uint8_t Wlan_NumSavedNetworks();

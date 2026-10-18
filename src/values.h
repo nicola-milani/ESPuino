@@ -78,6 +78,7 @@
 #define CMD_RESTARTSYSTEM  183 // Command: restart System
 #define CMD_NEXTFOLDER	   184 // Command: jump forwards to next folder (only applicable for recursive playmodes)
 #define CMD_PREVFOLDER	   185 // Command: jump forwards to previous folder (only applicable for recursive playmodes)
+#define CMD_BOX_MODO_CONFIG 187 // [BOX] apre la rete del box per configurarlo fuori casa
 #define CMD_SEEK_PREVIEW   186 // Command: rotary-gesture-only. Turning previews a target position (LED cursor); commits on release/idle instead of jumping immediately
 
 #define CMD_VIRTUAL_RFID_CARD_01 241 // Command: Virtual RFID-Card 900000000001

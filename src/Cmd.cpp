@@ -11,6 +11,7 @@
 #include "Log.h"
 #include "Mqtt.h"
 #include "Queues.h"
+#include "SdCard.h" // [BOX] per il suono della modalita' configurazione
 #include "System.h"
 #include "Wlan.h"
 
@@ -195,6 +196,20 @@ void Cmd_Action(const uint16_t mod) {
 
 		case CMD_TOGGLE_AMBIENT_LIGHT: {
 			Led_ToggleAmbientLight();
+			break;
+		}
+
+		// [BOX] Modalita' configurazione: apre la rete del box e lo dice a
+		// voce, perche' senza display non c'e' altro modo di accorgersene.
+		// La chiama la pressione lunga del tasto genitori, che sta incassato
+		// sotto la scatola: il bambino non ci arriva.
+		case CMD_BOX_MODO_CONFIG: {
+			System_SetOperationMode(OPMODE_NORMAL);
+			Wlan_ForceAccessPoint();
+			System_IndicateOk();
+			if (gFSystem.exists("/sistema/modalita-configurazione.mp3")) {
+				AudioPlayer_PlayAnnouncement("/sistema/modalita-configurazione.mp3");
+			}
 			break;
 		}
 

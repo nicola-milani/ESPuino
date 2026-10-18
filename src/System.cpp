@@ -7,6 +7,7 @@
 #include "AudioPlayer.h"
 #include "Bluetooth.h"
 #include "Ftp.h"
+#include "ControlloGenitoriBox.h" // [BOX]
 #include "Led.h"
 #include "Log.h"
 #include "MemX.h"
@@ -272,6 +273,7 @@ void System_PreparePowerDown(void) {
 	Ftp_Exit();
 	Mqtt_Exit();
 	Led_Exit();
+	Box_AlimentaLed(false); // [BOX] taglia l'alimentazione del LED: deep sleep sotto 1 mA
 	Bluetooth_Exit();
 
 	if (gPrefsSettings.getBool("recoverVolBoot", false)) {

@@ -82,5 +82,14 @@
     // Usati dai moduli nuovi (task 1, 2): non sono nomi che ESPuino conosce.
     #define BOX_CURSORE_ADC                  2          // cursore volume (ADC1)
     #define BOX_CURSORE_PWR                 42          // alimenta il cursore solo da svegli
-    // GPIO 12-17 liberi: erano del display e-paper, tolto il 18 ottobre.
+    // ---------------- LED di stato ----------------
+    // Un WS2812 dietro una finestrella sul fronte: batteria al risveglio,
+    // WiFi, modalita' configurazione, conferma del tag. Quanti LED si
+    // imposta dalla web UI; a noi ne basta uno.
+    // L'alimentazione passa da un GPIO perche' un WS2812 assorbe ~1 mA
+    // anche spento, e il deep sleep deve stare sotto il milliampere.
+    #define LED_PIN                         12
+    #define BOX_LED_PWR                     13
+
+    // GPIO 14-17 liberi: erano del display e-paper, tolto il 18 ottobre.
 #endif

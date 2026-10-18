@@ -168,7 +168,20 @@ void applicaDecisione(const box::Decisione &d) {
 // ------------------------------------------------------------------
 // Interfaccia verso il resto del firmware
 // ------------------------------------------------------------------
+// [BOX] Il WS2812 assorbe ~1 mA anche a LED spento: la sua alimentazione
+// passa da un GPIO, che va acceso all'avvio e spento prima del deep sleep,
+// se no il box non scende sotto il milliampere richiesto dal task 1.
+void Box_AlimentaLed(bool acceso) {
+#ifdef BOX_LED_PWR
+	pinMode(BOX_LED_PWR, OUTPUT);
+	digitalWrite(BOX_LED_PWR, acceso ? HIGH : LOW);
+#else
+	(void) acceso;
+#endif
+}
+
 void ControlloGenitoriBox_Init(void) {
+	Box_AlimentaLed(true);
 	gVolumeMassimoGenitori = AudioPlayer_GetMaxVolumeSpeaker();
 	gRegole = leggiRegole();
 	static box::ControlloGenitori controllo(gRegole, leggiStato());

@@ -12,6 +12,10 @@
 
 #include "ControlloGenitori.h"
 
+// Accende o spegne l'alimentazione del LED di stato (va spenta prima del
+// deep sleep: un WS2812 assorbe ~1 mA anche spento).
+void Box_AlimentaLed(bool acceso);
+
 // Carica regole e stato dalla memoria non volatile. Da chiamare in setup().
 void ControlloGenitoriBox_Init(void);
 

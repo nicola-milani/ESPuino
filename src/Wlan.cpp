@@ -604,6 +604,18 @@ void handleWifiStateConnected() {
 }
 
 static uint32_t wifiAPStartedTimestamp = 0;
+
+// [BOX] Apre la rete del box su richiesta, anche se una rete conosciuta e' a
+// portata. Senza, l'access point parte solo al primo tentativo dopo
+// l'accensione (vedi initialStart qui sotto): fuori casa funziona, ma se si
+// chiude per timeout l'unico modo di riaverlo e' spegnere e riaccendere.
+// La chiama il tasto genitori sul fondo, con una pressione lunga.
+void Wlan_ForceAccessPoint(void) {
+	Log_Println("Modalita' configurazione: apro la rete del box", LOGLEVEL_NOTICE);
+	accessPointStart(Wlan_GetApSSID().c_str(), Wlan_GetApPassword().c_str(), apIP, apNetmask);
+	wifiAPStartedTimestamp = millis();
+	wifiState = WIFI_STATE_AP;
+}
 void handleWifiStateConnectionFailed() {
 	// good candidate for a user setting
 	static constexpr uint32_t wifiReconnectTimeout = 600000;
