@@ -15,7 +15,7 @@
 	"restartinfo": "ESPuino si sta riavviando...<br>La pagina si ricarica da sola a riavvio finito.",
 	"shutdowninfo": "ESPuino si sta spegnendo...<br>La pagina si ricarica da sola quando ESPuino viene riacceso.",
 	"toast": {
-		"rfidDetect": "Rilevato il tag RFID {{rfidId}}.",
+		"rfidDetect": "Rilevato il tag NFC {{rfidId}}.",
 		"success": "Operazione eseguita.",
 		"dropout": "Flusso lento: sono possibili interruzioni.",
 		"saved": "Impostazioni salvate.",
@@ -28,7 +28,7 @@
 	},
 	"nav": {
 		"control": "Comandi",
-		"rfid": "RFID",
+		"rfid": "Statuine",
 		"wifi": "WiFi",
 		"mqtt": "MQTT",
 		"ftp": "FTP",
@@ -67,7 +67,7 @@
 			"offsetpauseExp": "Sfalsa di mezzo LED l'indicatore di pausa rispetto a quello di riposo, così la pausa si distingue a colpo d'occhio.",
 			"reverserotationExp": "Inverte il verso in cui scorre l'indicatore luminoso, per esempio negli anelli montati in senso antiorario.",
 			"rfidflash": "Lampeggia brevemente quando riconosce un tag",
-			"rfidflashExp": "Conferma un tag RFID già associato con un breve lampo verde, così si vede che è stato accettato. Un tag sconosciuto viene comunque segnalato in rosso."
+			"rfidflashExp": "Conferma un tag NFC già associato con un breve lampo verde, così si vede che è stato accettato. Un tag sconosciuto viene comunque segnalato in rosso."
 		},
 		"buttons": {
 			"title": "Azioni dei tasti",
@@ -273,9 +273,9 @@
 			"progress": "{{percent}}% ({{speed}} KB/s), mancano {{remaining.value}} {{remaining.unit}}..."
 		},
 		"rfid": {
-			"title": "Associazioni RFID",
+			"title": "Associazioni dei tag NFC",
 			"saveButton": "Salva l'associazione",
-			"idNumber": "Numero RFID (12 cifre) oppure <a href=\"https://forum.espuino.de/t/virtual-rfid-cards\" target=\"_blank\">virtuale</a>",
+			"idNumber": "Numero del tag NFC (12 cifre) oppure <a href=\"https://forum.espuino.de/t/virtual-rfid-cards\" target=\"_blank\">virtuale</a>",
 			"music": "Musica",
 			"modification": "Modifica",
 			"fileurl": {
@@ -370,16 +370,16 @@
 					"185": "📁 Vai alla cartella precedente",
 					"186": "🎯 Anteprima della ricerca (ruota per spostarti, conferma al rilascio)",
 					"199": "📊 Mostra il carico dei task (console)",
-					"241": "🏷 Riproduci il tag RFID virtuale 01",
-					"242": "🏷 Riproduci il tag RFID virtuale 02",
-					"243": "🏷 Riproduci il tag RFID virtuale 03",
-					"244": "🏷 Riproduci il tag RFID virtuale 04",
-					"245": "🏷 Riproduci il tag RFID virtuale 05",
-					"246": "🏷 Riproduci il tag RFID virtuale 06",
-					"247": "🏷 Riproduci il tag RFID virtuale 07",
-					"248": "🏷 Riproduci il tag RFID virtuale 08",
-					"249": "🏷 Riproduci il tag RFID virtuale 09",
-					"250": "🏷 Riproduci il tag RFID virtuale 10"
+					"241": "🏷 Riproduci il tag NFC virtuale 01",
+					"242": "🏷 Riproduci il tag NFC virtuale 02",
+					"243": "🏷 Riproduci il tag NFC virtuale 03",
+					"244": "🏷 Riproduci il tag NFC virtuale 04",
+					"245": "🏷 Riproduci il tag NFC virtuale 05",
+					"246": "🏷 Riproduci il tag NFC virtuale 06",
+					"247": "🏷 Riproduci il tag NFC virtuale 07",
+					"248": "🏷 Riproduci il tag NFC virtuale 08",
+					"249": "🏷 Riproduci il tag NFC virtuale 09",
+					"250": "🏷 Riproduci il tag NFC virtuale 10"
 				}
 			}
 		}
@@ -538,14 +538,14 @@
 			"info": "Secondo la libreria (ESP32-audioI2S) le frequenze sono 500 Hz LowShelf, 3000 Hz PeakEQ e 6000 Hz HighShelf."
 		},
 		"rfid": {
-			"title": "Lettore RFID",
+			"title": "Lettore NFC",
 			"readerType": {
 				"title": "Tipo di lettore",
 				"auto": "Riconoscimento automatico",
 				"mfrc522_spi": "MFRC522 (SPI)",
 				"mfrc522_i2c": "MFRC522 (I2C)",
 				"pn5180": "PN5180",
-				"description": "Scegli il tipo di lettore RFID collegato al tuo ESPuino. Con il riconoscimento automatico prova a capirlo da solo."
+				"description": "Scegli il tipo di lettore NFC collegato al tuo ESPuino. Con il riconoscimento automatico prova a capirlo da solo."
 			},
 			"pn5180Lpcd": "Attiva l'LPCD del PN5180",
 			"pn5180LpcdExp": "Attiva il rilevamento a basso consumo (Low Power Card Detection) del lettore PN5180. Servono il firmware 4.0 o successivo del PN5180 e i ponticelli di saldatura configurati nel modo giusto. Altre informazioni <a href='https://forum.espuino.de/t/was-ist-lpcd-und-wie-funktioniert-es/1664' target='_blank'>qui</a>.",
@@ -566,18 +566,18 @@
 			"savePlayPosShutdown": "Ricorda il punto di ascolto allo spegnimento",
 			"savePlayPosShutdownExp": "Quando il box viene spento, il punto di ascolto degli audiolibri viene salvato. Altre informazioni <a href='https://forum.espuino.de/t/welche-optionen-beim-kompilieren-gibt-es/120' target='_blank'>qui</a>, sotto <code>SAVE_PLAYPOS_BEFORE_SHUTDOWN</code>.",
 			"savePlayPosRfidChange": "Ricorda il punto di ascolto quando cambia il tag",
-			"savePlayPosRfidChangeExp": "Passando a un nuovo tag RFID, il punto di ascolto degli audiolibri viene salvato. Non vale per i tag di modifica. Altre informazioni <a href='https://forum.espuino.de/t/welche-optionen-beim-kompilieren-gibt-es/120' target='_blank'>qui</a>, sotto <code>SAVE_PLAYPOS_WHEN_RFID_CHANGE</code>.",
+			"savePlayPosRfidChangeExp": "Passando a un nuovo tag NFC, il punto di ascolto degli audiolibri viene salvato. Non vale per i tag di modifica. Altre informazioni <a href='https://forum.espuino.de/t/welche-optionen-beim-kompilieren-gibt-es/120' target='_blank'>qui</a>, sotto <code>SAVE_PLAYPOS_WHEN_RFID_CHANGE</code>.",
 			"savePlayPosInterval": "Salva da solo il punto degli audiolibri lunghi ogni",
 			"savePlayPosIntervalSecs": "secondi",
 			"savePlayPosIntervalExp": "Salva periodicamente nella memoria interna il punto di ascolto degli audiolibri lunghi (file da cinque minuti in su), così un'interruzione improvvisa (batteria scarica, spina staccata, blocco) fa perdere al massimo i secondi impostati invece di far ripartire il file da capo. Vale solo per le modalità audiolibro: i brani corti o già divisi vengono salvati a ogni cambio di traccia. Un intervallo più breve scrive più spesso nella memoria, quindi sono consigliati 30-60 secondi; scendere molto più in basso serve a poco e consuma la memoria.",
 			"pauseIfRfidRemoved": "Metti in pausa quando il tag viene tolto",
-			"pauseIfRfidRemovedExp": "La riproduzione va in pausa quando il tag RFID viene tolto.",
+			"pauseIfRfidRemovedExp": "La riproduzione va in pausa quando il tag NFC viene tolto.",
 			"dontAcceptRfidTwice": "Non accettare due volte lo stesso tag",
-			"dontAcceptRfidTwiceExp": "Lo stesso tag RFID non viene accettato due volte di fila. Non si può usare insieme a <em>Metti in pausa quando il tag viene tolto</em>.",
+			"dontAcceptRfidTwiceExp": "Lo stesso tag NFC non viene accettato due volte di fila. Non si può usare insieme a <em>Metti in pausa quando il tag viene tolto</em>.",
 			"resumeOnSameRfid": "Riprendi dalla pausa rimettendo lo stesso tag",
-			"resumeOnSameRfidExp": "Se la riproduzione è in pausa e viene rimesso lo stesso tag RFID, l'ascolto riprende. Ha effetto solo se è attivo <em>Non accettare due volte lo stesso tag</em>.",
+			"resumeOnSameRfidExp": "Se la riproduzione è in pausa e viene rimesso lo stesso tag NFC, l'ascolto riprende. Ha effetto solo se è attivo <em>Non accettare due volte lo stesso tag</em>.",
 			"playLastRfidOnReboot": "Riprendi l'ultimo tag al riavvio",
-			"playLastRfidOnRebootExp": "Al riavvio riparte l'ultimo tag RFID usato.",
+			"playLastRfidOnRebootExp": "Al riavvio riparte l'ultimo tag NFC usato.",
 			"pauseOnMinVolume": "Pausa al volume minimo",
 			"pauseOnMinVolumeExp": "La riproduzione va in pausa quando il volume arriva al minimo. Altre informazioni <a href='https://forum.espuino.de/t/lautstaerke-0-pause/1631' target='_blank'>qui</a>",
 			"nightVolumeLimit": "Limita il volume in modalità notte",
@@ -636,7 +636,7 @@
 		},
 		"tabs": {
 			"playback": "Riproduzione",
-			"rfidReader": "Lettore RFID",
+			"rfidReader": "Lettore NFC",
 			"encoderButtons": "Encoder e tasti",
 			"led": "LED",
 			"power": "Alimentazione"
@@ -644,30 +644,30 @@
 	},
 	"tools": {
 		"nvs": {
-			"title": "Associazioni RFID salvate",
-			"desc": "Le associazioni RFID non stanno sulla scheda SD ma nella memoria interna non volatile (NVS) di ESPuino.",
+			"title": "Associazioni dei tag NFC salvate",
+			"desc": "Le associazioni dei tag NFC non stanno sulla scheda SD ma nella memoria interna non volatile (NVS) di ESPuino.",
 			"list": {
 				"title": "Elenco di tutte le associazioni salvate",
 				"show": "Mostra le associazioni"
 			},
 			"erase": {
-				"title": "Cancella tutte le associazioni RFID",
+				"title": "Cancella tutte le associazioni dei tag NFC",
 				"desc": "Importando un backup le voci nuove vengono aggiunte, ma quelle vecchie non vengono cancellate: solo se esiste già un'associazione per la stessa voce viene sovrascritta. Con questa funzione si cancellano tutte le associazioni esistenti.<br>Altre <a href=\"https://forum.espuino.de/t/die-backupfunktion-des-espuino/508\" target=\"_blank\">informazioni</a> (in tedesco).",
 				"button": "Cancella tutte le associazioni",
-				"prompt": "Vuoi cancellare tutte le associazioni RFID salvate?"
+				"prompt": "Vuoi cancellare tutte le associazioni dei tag NFC salvate?"
 			},
 			"delete": {
-				"title": "Cancella l'associazione RFID",
+				"title": "Cancella l'associazione del tag NFC",
 				"prompt": "Vuoi togliere l'associazione «{{rfid}}»?"
 			},
 			"import": {
 				"title": "Importa",
-				"desc": "Qui si può caricare un file di backup per importare le associazioni RFID.",
+				"desc": "Qui si può caricare un file di backup per importare le associazioni dei tag NFC.",
 				"button": "Importa le associazioni"
 			},
 			"export": {
 				"title": "Esporta",
-				"desc": "Qui si può scaricare un file di backup con le associazioni RFID.",
+				"desc": "Qui si può scaricare un file di backup con le associazioni dei tag NFC.",
 				"button": "Esporta le associazioni"
 			}
 		},
@@ -694,7 +694,7 @@
 	},
 	"mediahub": {
 		"title": "MediaHub",
-		"intro": "MediaHub è un'aggiunta facoltativa, da installare a parte: un piccolo server locale che gira come container Docker sulla tua rete. Permette di gestire in un posto solo le associazioni dei tag RFID di più ESPuino: contenuto e modalità di riproduzione arrivano dal server invece che dalla memoria interna del box. Senza un server MediaHub attivo, questa pagina non serve a nulla. Qui si registrano gli indirizzi dei tuoi server MediaHub, così compaiono nell'elenco quando associ un tag. Il server MediaHub si trova su GitHub: <a href='https://github.com/biologist79/ESPuino-Mediahub' target='_blank'>github.com/biologist79/ESPuino-Mediahub</a>.",
+		"intro": "MediaHub è un'aggiunta facoltativa, da installare a parte: un piccolo server locale che gira come container Docker sulla tua rete. Permette di gestire in un posto solo le associazioni dei tag NFC di più ESPuino: contenuto e modalità di riproduzione arrivano dal server invece che dalla memoria interna del box. Senza un server MediaHub attivo, questa pagina non serve a nulla. Qui si registrano gli indirizzi dei tuoi server MediaHub, così compaiono nell'elenco quando associ un tag. Il server MediaHub si trova su GitHub: <a href='https://github.com/biologist79/ESPuino-Mediahub' target='_blank'>github.com/biologist79/ESPuino-Mediahub</a>.",
 		"serversTitle": "Aggiungi un media server",
 		"registeredServersTitle": "Media server registrati"
 	},
