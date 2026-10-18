@@ -9,6 +9,7 @@
 #include "Bluetooth.h"
 #include "Button.h"
 #include "Cmd.h"
+#include "ControlloGenitoriBox.h" // [BOX] task 6
 #include "Common.h"
 #include "Ftp.h"
 #include "HallEffectSensor.h"
@@ -128,6 +129,7 @@ void setup() {
 		Rfid_WakeupHandling();
 	}
 	System_Init();
+	ControlloGenitoriBox_Init(); // [BOX] task 6
 
 // Init 2nd i2c-bus if RC522 is used with i2c or if port-expander is enabled
 #ifdef I2C_2_ENABLE

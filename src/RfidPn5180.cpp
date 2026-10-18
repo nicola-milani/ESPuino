@@ -4,6 +4,7 @@
 #include "RfidPn5180.h"
 
 #include "AudioPlayer.h"
+#include "ControlloGenitoriBox.h" // [BOX] task 6
 #include "HallEffectSensor.h"
 #include "Log.h"
 #include "MemX.h"
@@ -448,6 +449,7 @@ void RfidPn5180_Task(void *parameter) {
 			if (!cardAppliedCurrentRun && cardAppliedLastRun && !gPlayProperties.pausePlay && !gPlayProperties.playlistFinished && gPlayProperties.playMode != NO_PLAYLIST && System_GetOperationMode() != OPMODE_BLUETOOTH_SINK) { // Card removed => pause
 				AudioPlayer_SetTrackControl(PAUSEPLAY);
 				Log_Println(rfidTagRemoved, LOGLEVEL_NOTICE);
+				ControlloGenitoriBox_TagTolto(gCurrentRfidTagId); // [BOX] task 6: resta in pausa, non consumata
 			}
 			cardAppliedLastRun = cardAppliedCurrentRun;
 		}

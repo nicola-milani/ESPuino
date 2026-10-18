@@ -4,6 +4,7 @@
 #include "AudioPlayer.h"
 #include "Cmd.h"
 #include "Common.h"
+#include "ControlloGenitoriBox.h" // [BOX] task 6
 #include "Led.h"
 #include "Log.h"
 #include "MediaHub.h"
@@ -109,6 +110,12 @@ void Rfid_PreferenceLookupHandler(void) {
 					System_SetOperationMode(OPMODE_NORMAL);
 				}
 	#endif
+
+				// [BOX] Controllo genitori (task 6): in fascia di riposo la
+				// statuina non avvia niente, parte il messaggio della nanna.
+				if (!ControlloGenitoriBox_PuoPartire(gCurrentRfidTagId)) {
+					return;
+				}
 
 				if (_playMode == MEDIAHUB) {
 					// Dispatch to MediaHub before the normal AudioPlayer logic gets

@@ -7,6 +7,7 @@
 #include "Bluetooth.h"
 #include "Cmd.h"
 #include "Common.h"
+#include "ControlloGenitoriBox.h" // [BOX] task 6
 #include "EnumUtils.h"
 #include "Led.h"
 #include "Log.h"
@@ -1220,6 +1221,7 @@ void AudioPlayer_Loop() {
 
 		if (gPlayProperties.currentTrackNumber >= gPlayProperties.playlist->size()) { // Check if last element of playlist is already reached
 			Log_Println(endOfPlaylistReached, LOGLEVEL_NOTICE);
+			ControlloGenitoriBox_StoriaFinita(); // [BOX] task 6: da qui in poi si blocca
 			if (!gPlayProperties.repeatPlaylist) {
 				if (gPlayProperties.saveLastPlayPosition) {
 					// Set back to first track
