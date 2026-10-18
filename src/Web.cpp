@@ -4,6 +4,7 @@
 #include "Web.h"
 
 #include "ArduinoJson.h"
+#include "ControlloGenitoriBox.h" // [BOX] task 6
 #include "AsyncJson.h"
 #include "AudioPlayer.h"
 #include "Battery.h"
@@ -102,6 +103,8 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request);
 static void handleGetMediaHubServers(AsyncWebServerRequest *request);
 static void handlePostMediaHubServers(AsyncWebServerRequest *request, JsonVariant &json);
 static void handleDeleteMediaHubServers(AsyncWebServerRequest *request);
+static void handleGetGenitori(AsyncWebServerRequest *request);                      // [BOX] task 6
+static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json);  // [BOX] task 6
 static void handleGetInfo(AsyncWebServerRequest *request);
 static void handleGetSettings(AsyncWebServerRequest *request);
 static void handlePostSettings(AsyncWebServerRequest *request, JsonVariant &json);
@@ -619,6 +622,10 @@ void webserverStart(void) {
 		wServer.addHandler(new AsyncCallbackJsonWebHandler("/rfid", handlePostRFIDRequest));
 		wServer.addRewrite(new OneParamRewrite("/rfid/{id}", "/rfid?id={id}"));
 		wServer.on("/rfid", HTTP_DELETE, handleDeleteRFIDRequest);
+
+		// [BOX] task 6: pagina "Controllo genitori"
+		wServer.on("/genitori", HTTP_GET, handleGetGenitori);
+		wServer.addHandler(new AsyncCallbackJsonWebHandler("/genitori", handlePostGenitori));
 
 		// MediaHub registered servers (concept §5.1)
 		wServer.on("/mediahubservers", HTTP_GET, handleGetMediaHubServers);
@@ -2846,6 +2853,111 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request) {
 
 // Registered MediaHub servers (concept §5.1): pure Web-UI enrollment
 // convenience, never read by the runtime playback flow.
+// ============================================================
+// [BOX] task 6 — controllo genitori
+// Un paio di rotte tutte nostre invece di infilarci nelle impostazioni
+// generali: si legge meglio e non rischia di rompere il resto.
+// ============================================================
+static void handleGetGenitori(AsyncWebServerRequest *request) {
+	AsyncJsonResponse *response = new AsyncJsonResponse(false);
+	JsonObject root = response->getRoot();
+
+	struct tm t;
+	char quando[32] = "";
+	const bool oraLetta = getLocalTime(&t, 50);
+	if (oraLetta) {
+		strftime(quando, sizeof(quando), "%d/%m/%Y %H:%M", &t);
+	}
+	JsonObject ora = root["ora"].to<JsonObject>();
+	ora["testo"] = quando;
+	ora["affidabile"] = !ControlloGenitoriBox_OraNonAffidabile();
+
+	root["riposoBloccato"] = ControlloGenitoriBox_RiposoBloccato();
+
+	const box::Regole &r = ControlloGenitoriBox_Regole();
+	root["volumeMassimoNormale"] = r.volumeMassimoNormale;
+	root["dissolvenzaSecondi"] = r.dissolvenzaSecondi;
+	root["storieConcesseNanna"] = r.storieConcesseNanna;
+	root["volumeMassimoNanna"] = r.volumeMassimoNanna;
+	root["oraDelMattino"] = r.oraDelMattino;
+
+	JsonArray giorni = root["giorni"].to<JsonArray>();
+	for (int g = 0; g < 7; g++) {
+		JsonArray fasce = giorni.add<JsonArray>();
+		for (int i = 0; i < box::MAX_FASCE; i++) {
+			const box::Fascia &f = r.fasce[g][i];
+			JsonObject o = fasce.add<JsonObject>();
+			o["attiva"] = f.attiva;
+			o["inizio"] = f.inizio;
+			o["fine"] = f.fine;
+			o["storie"] = f.storieConcesse;
+			o["volume"] = f.volumeMassimo;
+		}
+	}
+
+	response->setLength();
+	request->send(response);
+}
+
+static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json) {
+	JsonObject obj = json.as<JsonObject>();
+
+	// "Nanna adesso" e "annulla" sono azioni, non impostazioni.
+	if (obj["annullaNanna"].is<bool>() && obj["annullaNanna"].as<bool>()) {
+		ControlloGenitoriBox_AnnullaNanna();
+		request->send(200, "text/plain; charset=utf-8", "ok");
+		return;
+	}
+	if (obj["nannaMinuti"].is<int>()) {
+		ControlloGenitoriBox_NannaAdesso(obj["nannaMinuti"].as<int>());
+		request->send(200, "text/plain; charset=utf-8", "ok");
+		return;
+	}
+
+	box::Regole r = ControlloGenitoriBox_Regole();
+	if (obj["volumeMassimoNormale"].is<int>()) {
+		r.volumeMassimoNormale = obj["volumeMassimoNormale"].as<int>();
+	}
+	if (obj["dissolvenzaSecondi"].is<int>()) {
+		r.dissolvenzaSecondi = obj["dissolvenzaSecondi"].as<int>();
+	}
+	if (obj["storieConcesseNanna"].is<int>()) {
+		r.storieConcesseNanna = obj["storieConcesseNanna"].as<int>();
+	}
+	if (obj["volumeMassimoNanna"].is<int>()) {
+		r.volumeMassimoNanna = obj["volumeMassimoNanna"].as<int>();
+	}
+	if (obj["oraDelMattino"].is<int>()) {
+		r.oraDelMattino = obj["oraDelMattino"].as<int>();
+	}
+
+	// Le fasce non presenti nel JSON restano come sono.
+	JsonArray giorni = obj["giorni"].as<JsonArray>();
+	int g = 0;
+	for (JsonVariant giorno : giorni) {
+		if (g >= 7) {
+			break;
+		}
+		int i = 0;
+		for (JsonVariant fascia : giorno.as<JsonArray>()) {
+			if (i >= box::MAX_FASCE) {
+				break;
+			}
+			JsonObject f = fascia.as<JsonObject>();
+			r.fasce[g][i].attiva = f["attiva"] | false;
+			r.fasce[g][i].inizio = f["inizio"] | 0;
+			r.fasce[g][i].fine = f["fine"] | 0;
+			r.fasce[g][i].storieConcesse = f["storie"] | 1;
+			r.fasce[g][i].volumeMassimo = f["volume"] | 0;
+			i++;
+		}
+		g++;
+	}
+
+	ControlloGenitoriBox_SalvaRegole(r);
+	request->send(200, "text/plain; charset=utf-8", "ok");
+}
+
 static void handleGetMediaHubServers(AsyncWebServerRequest *request) {
 	AsyncJsonResponse *response = new AsyncJsonResponse(true);
 	JsonArray arr = response->getRoot();

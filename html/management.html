@@ -720,6 +720,9 @@
 			<a class="nav-item nav-link main-tab-item" id="nav-general-tab" data-bs-toggle="tab" href="#nav-general"
 				data-bs-target="#nav-general" role="tab" aria-controls="nav-general" aria-selected="false"><i
 					class="fas fa-sliders-h"></i><span data-i18n="nav.general"></span></a>
+			<a class="nav-item nav-link main-tab-item" id="nav-genitori-tab" data-bs-toggle="tab" href="#nav-genitori"
+				data-bs-target="#nav-genitori" role="tab" aria-controls="nav-genitori" aria-selected="false"><i
+					class="fas fa-moon"></i><span data-i18n="genitori.nav"></span></a>
 			<a class="nav-item nav-link main-tab-item" id="nav-updates-tab" data-bs-toggle="tab" href="#nav-updates"
 				data-bs-target="#nav-updates" role="tab" aria-controls="nav-updates" aria-selected="false"><i
 					class="fas fa-cloud-upload-alt"></i><span data-i18n="nav.updates"></span></a>
@@ -736,6 +739,90 @@
 		</div>
 	</nav>
 	<div class="tab-content" id="nav-tabContent">
+		<!-- ### Tab Controllo genitori (task 6) ### -->
+		<div class="tab-pane main-tab-pane fade mb-4" id="nav-genitori" role="tabpanel"
+			aria-labelledby="nav-genitori-tab">
+			<div class="container">
+				<h2 data-i18n="genitori.titolo"></h2>
+
+				<div class="alert alert-secondary d-flex justify-content-between align-items-center" role="alert">
+					<span><span data-i18n="genitori.oraDelBox"></span>: <strong id="genitoriOra">--</strong></span>
+					<span id="genitoriStatoRiposo" class="badge bg-info" style="display:none"
+						data-i18n="genitori.riposoAttivo"></span>
+				</div>
+				<div class="alert alert-warning" id="genitoriOraNonAffidabile" style="display:none" role="alert"
+					data-i18n="genitori.oraNonAffidabile"></div>
+
+				<fieldset class="mb-4">
+					<legend data-i18n="genitori.nannaAdesso"></legend>
+					<p class="text-muted" data-i18n="genitori.nannaAdessoSpiega"></p>
+					<div class="btn-group" role="group">
+						<button type="button" class="btn btn-outline-primary genitori-nanna" data-minuti="30">30
+							<span data-i18n="datetime.minutes"></span></button>
+						<button type="button" class="btn btn-outline-primary genitori-nanna" data-minuti="60">60
+							<span data-i18n="datetime.minutes"></span></button>
+						<button type="button" class="btn btn-outline-primary genitori-nanna" data-minuti="90">90
+							<span data-i18n="datetime.minutes"></span></button>
+						<button type="button" class="btn btn-outline-primary genitori-nanna" data-minuti="0"
+							data-i18n="genitori.finoAlMattino"></button>
+						<button type="button" class="btn btn-outline-secondary" id="genitoriAnnullaNanna"
+							data-i18n="genitori.annullaNanna"></button>
+					</div>
+				</fieldset>
+
+				<fieldset class="mb-4">
+					<legend data-i18n="genitori.fasce"></legend>
+					<p class="text-muted" data-i18n="genitori.fasceSpiega"></p>
+					<div class="table-responsive">
+						<table class="table table-sm align-middle">
+							<thead>
+								<tr>
+									<th data-i18n="genitori.giorno"></th>
+									<th data-i18n="genitori.fascia"></th>
+									<th data-i18n="genitori.attiva"></th>
+									<th data-i18n="genitori.dalle"></th>
+									<th data-i18n="genitori.alle"></th>
+									<th data-i18n="genitori.storie"></th>
+									<th data-i18n="genitori.volume"></th>
+								</tr>
+							</thead>
+							<tbody id="genitoriTabella"></tbody>
+						</table>
+					</div>
+					<button type="button" class="btn btn-link p-0" id="genitoriCopiaGiorno"
+						data-i18n="genitori.copiaSuTutti"></button>
+				</fieldset>
+
+				<fieldset class="mb-4">
+					<legend data-i18n="genitori.altro"></legend>
+					<div class="row g-3">
+						<div class="col-md-3">
+							<label class="form-label" for="genitoriDissolvenza"
+								data-i18n="genitori.dissolvenza"></label>
+							<input type="number" class="form-control" id="genitoriDissolvenza" min="0" max="120">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label" for="genitoriStorieNanna"
+								data-i18n="genitori.storieNanna"></label>
+							<input type="number" class="form-control" id="genitoriStorieNanna" min="0" max="5">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label" for="genitoriVolumeNanna"
+								data-i18n="genitori.volumeNanna"></label>
+							<input type="number" class="form-control" id="genitoriVolumeNanna" min="1" max="21">
+						</div>
+						<div class="col-md-3">
+							<label class="form-label" for="genitoriMattino" data-i18n="genitori.mattino"></label>
+							<input type="time" class="form-control" id="genitoriMattino">
+						</div>
+					</div>
+					<p class="text-muted mt-3" data-i18n="genitori.messaggiSpiega"></p>
+				</fieldset>
+
+				<button type="button" class="btn btn-primary" id="genitoriSalva" data-i18n="genitori.salva"></button>
+			</div>
+		</div>
+
 		<!-- ### Tab Wifi ### -->
 		<div class="tab-pane main-tab-pane fade mb-4" id="nav-wifi" role="tabpanel" aria-labelledby="nav-wifi-tab">
 			<div class="container" id="wifiConfig">
@@ -2916,6 +3003,10 @@
 			}
 		});
 		i18next.on('languageChanged', (lng) => {
+			// [BOX] Dichiara la lingua al browser: senza questo Chrome crede che
+			// la pagina sia inglese e si offre di tradurla sopra la traduzione,
+			// con risultati comici ("Fasce di riposo" -> "Muscoli a riposo").
+			document.documentElement.lang = lng;
 			document.querySelector('#langSel').value = lng;
 			if (localize) {
 				localize('body');
@@ -5982,6 +6073,122 @@
 				}
 			}, 3000);
 		});
+	</script>
+	<script>
+		// ===== Controllo genitori (task 6) =====
+		// Parla con /genitori: GET per leggere, POST per salvare o per far
+		// partire la nanna. Le regole valgono dal tentativo successivo del
+		// bambino, senza toccare il box.
+		(function () {
+			const GIORNI = ["genitori.lun", "genitori.mar", "genitori.mer", "genitori.gio",
+				"genitori.ven", "genitori.sab", "genitori.dom"];
+			const NOMI_FASCIA = ["genitori.nanna", "genitori.notte", "genitori.terza"];
+			let numeroFasce = 2;
+
+			const aOrologio = (minuti) => String(Math.floor(minuti / 60)).padStart(2, "0") + ":" +
+				String(minuti % 60).padStart(2, "0");
+			const aMinuti = (testo) => {
+				const [h, m] = (testo || "0:0").split(":").map(Number);
+				return (h || 0) * 60 + (m || 0);
+			};
+
+            const traduci = (chiave) => (window.i18next ? i18next.t(chiave) : chiave);
+
+			function disegnaTabella(giorni) {
+				const corpo = document.getElementById("genitoriTabella");
+				corpo.innerHTML = "";
+				giorni.forEach((fasce, g) => {
+					fasce.slice(0, numeroFasce).forEach((f, i) => {
+						const riga = document.createElement("tr");
+						riga.innerHTML =
+							(i === 0 ? `<td rowspan="${numeroFasce}"><strong>${traduci(GIORNI[g])}</strong></td>` : "") +
+							`<td>${traduci(NOMI_FASCIA[i])}</td>` +
+							`<td><input type="checkbox" class="form-check-input" data-campo="attiva" ${f.attiva ? "checked" : ""}></td>` +
+							`<td><input type="time" class="form-control form-control-sm" data-campo="inizio" value="${aOrologio(f.inizio)}"></td>` +
+							`<td><input type="time" class="form-control form-control-sm" data-campo="fine" value="${aOrologio(f.fine)}"></td>` +
+							`<td><input type="number" class="form-control form-control-sm" data-campo="storie" min="0" max="5" value="${f.storie}"></td>` +
+							`<td><input type="number" class="form-control form-control-sm" data-campo="volume" min="0" max="21" value="${f.volume}"></td>`;
+						riga.dataset.giorno = g;
+						riga.dataset.fascia = i;
+						corpo.appendChild(riga);
+					});
+				});
+			}
+
+			function leggiTabella() {
+				const giorni = Array.from({ length: 7 }, () => []);
+				document.querySelectorAll("#genitoriTabella tr").forEach((riga) => {
+					const g = Number(riga.dataset.giorno);
+					const prendi = (campo) => riga.querySelector(`[data-campo="${campo}"]`);
+					giorni[g].push({
+						attiva: prendi("attiva").checked,
+						inizio: aMinuti(prendi("inizio").value),
+						fine: aMinuti(prendi("fine").value),
+						storie: Number(prendi("storie").value),
+						volume: Number(prendi("volume").value),
+					});
+				});
+				return giorni;
+			}
+
+			async function carica() {
+				const r = await fetch("/genitori");
+				if (!r.ok) { return; }
+				const d = await r.json();
+				document.getElementById("genitoriOra").textContent = d.ora.testo || "--";
+				document.getElementById("genitoriOraNonAffidabile").style.display =
+					d.ora.affidabile ? "none" : "block";
+				document.getElementById("genitoriStatoRiposo").style.display =
+					d.riposoBloccato ? "inline-block" : "none";
+				document.getElementById("genitoriDissolvenza").value = d.dissolvenzaSecondi;
+				document.getElementById("genitoriStorieNanna").value = d.storieConcesseNanna;
+				document.getElementById("genitoriVolumeNanna").value = d.volumeMassimoNanna;
+				document.getElementById("genitoriMattino").value = aOrologio(d.oraDelMattino);
+				numeroFasce = Math.min(2, (d.giorni[0] || []).length);
+				disegnaTabella(d.giorni);
+			}
+
+			async function invia(corpo) {
+				const r = await fetch("/genitori", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(corpo),
+				});
+				return r.ok;
+			}
+
+			document.addEventListener("DOMContentLoaded", () => {
+				const linguetta = document.getElementById("nav-genitori-tab");
+				if (linguetta) { linguetta.addEventListener("shown.bs.tab", carica); }
+
+				document.getElementById("genitoriSalva").addEventListener("click", async () => {
+					const ok = await invia({
+						dissolvenzaSecondi: Number(document.getElementById("genitoriDissolvenza").value),
+						storieConcesseNanna: Number(document.getElementById("genitoriStorieNanna").value),
+						volumeMassimoNanna: Number(document.getElementById("genitoriVolumeNanna").value),
+						oraDelMattino: aMinuti(document.getElementById("genitoriMattino").value),
+						giorni: leggiTabella(),
+					});
+					if (ok) { carica(); }
+				});
+
+				document.querySelectorAll(".genitori-nanna").forEach((b) => {
+					b.addEventListener("click", async () => {
+						await invia({ nannaMinuti: Number(b.dataset.minuti) });
+						carica();
+					});
+				});
+				document.getElementById("genitoriAnnullaNanna").addEventListener("click", async () => {
+					await invia({ annullaNanna: true });
+					carica();
+				});
+
+				document.getElementById("genitoriCopiaGiorno").addEventListener("click", () => {
+					const giorni = leggiTabella();
+					disegnaTabella(Array.from({ length: 7 }, () => giorni[0].map((f) => ({ ...f }))));
+				});
+			});
+		})();
 	</script>
 </body>
 
