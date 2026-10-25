@@ -71,16 +71,16 @@
 		},
 		"buttons": {
 			"title": "Azioni dei tasti",
-			"titleExp": "Assegna a ogni tasto un'azione per la pressione breve e una per quella lunga.",
+			"titleExp": "Assegna a ogni tasto un'azione per la pressione breve e una per quella lunga. I tasti sono indicati per colore e posizione, non per funzione: la funzione è proprio quella che stai cambiando qui.",
 			"short": "pressione breve",
 			"long": "pressione lunga",
 			"noaction": "--",
-			"button0": "Tasto avanti (Btn0)",
-			"button1": "Tasto indietro (Btn1)",
-			"button2": "Tasto play/pausa (Btn2)",
-			"button3": "Tasto dell'encoder (Btn3)",
-			"button4": "Tasto Btn4",
-			"button5": "Tasto Btn5"
+			"button0": "Tasto verde, al centro del fronte (Btn0)",
+			"button1": "Non collegato (Btn1)",
+			"button2": "Tasto rosa, il più grande a destra (Btn2)",
+			"button3": "Non collegato: la manopola non si preme (Btn3)",
+			"button4": "Tasto blu, a sinistra del fronte (Btn4)",
+			"button5": "Tasto genitori, nel pozzetto sul retro (Btn5)"
 		},
 		"multibuttons": {
 			"title": "Azioni con due tasti",
