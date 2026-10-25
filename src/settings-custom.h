@@ -48,16 +48,19 @@
     // ---------------- tasti ----------------
     // 99 = disabilitato. Nessuna azione lunga, nessuna combinazione:
     // le azioni sono in settings-override.h.
-    #define NEXT_BUTTON                     21          // avanti (GPIO RTC: sveglia il box)
-    #define PREVIOUS_BUTTON                 47          // indietro
-    #define PAUSEPLAY_BUTTON                 0          // tasto genitori sul fondo (in parallelo a BOOT)
-    #define ROTARYENCODER_BUTTON            99
-    #define BUTTON_4                        99
-    #define BUTTON_5                        99
+    // Fronte, da sinistra: "da capo" (blu), "il prossimo" (verde),
+    // play/pausa (rosa, piu' grande). Retro: tasto genitori nel pozzetto.
+    #define PAUSEPLAY_BUTTON                21          // play/pausa (GPIO RTC: sveglia il box)
+    #define NEXT_BUTTON                     47          // "il prossimo"
+    #define BUTTON_4                        17          // "da capo" (azione: CMD_FIRSTTRACK)
+    #define BUTTON_5                         0          // tasto genitori (in parallelo a BOOT)
+    #define PREVIOUS_BUTTON                 99
+    #define ROTARYENCODER_BUTTON            99          // la pressione dell'encoder non e' collegata
 
-    // Risveglio dal deep sleep: il tasto avanti (GPIO RTC).
-    // L'altro risveglio e' l'appoggio della statuina, via RFID_IRQ (LPCD).
-    #define WAKEUP_BUTTON                   NEXT_BUTTON
+    // Risveglio dal deep sleep: play/pausa, che e' su un GPIO RTC ed e' il
+    // tasto che un bambino preme per primo quando il box e' addormentato.
+    // L'altro risveglio e' l'appoggio della tessera, via RFID_IRQ (LPCD).
+    #define WAKEUP_BUTTON                   PAUSEPLAY_BUTTON
 
     // ---------------- I2C ----------------
     // ESPuino accende sempre il secondo bus I2C quando c'e' la selezione del
@@ -78,10 +81,12 @@
         constexpr adc_attenuation_t inputAttenuation = ADC_11db;
     #endif
 
-    // ---------------- nostri, non di ESPuino ----------------
-    // Usati dai moduli nuovi (task 1, 2): non sono nomi che ESPuino conosce.
-    #define BOX_CURSORE_ADC                  2          // cursore volume (ADC1)
-    #define BOX_CURSORE_PWR                 42          // alimenta il cursore solo da svegli
+    // ---------------- manopola del volume ----------------
+    // Encoder EC11 con scatti (25 ottobre): sostituisce il cursore a slitta,
+    // che ESPuino non sapeva leggere e che teneva 330 uA sempre accesi.
+    // Nomi di ESPuino: vanno insieme a USEROTARY_ENABLE in settings-override.h.
+    #define ROTARYENCODER_CLK               14
+    #define ROTARYENCODER_DT                15
     // ---------------- LED di stato ----------------
     // Un WS2812 dietro una finestrella sul fronte: batteria al risveglio,
     // WiFi, modalita' configurazione, conferma del tag. Quanti LED si
@@ -91,5 +96,7 @@
     #define LED_PIN                         12
     #define BOX_LED_PWR                     13
 
-    // GPIO 14-17 liberi: erano del display e-paper, tolto il 18 ottobre.
+    // GPIO 2, 16 e 42 liberi: 2 e 42 erano del cursore a slitta (tolto il
+    // 25 ottobre), 16 era del display. Uno dei tre diventa HP_DETECT se
+    // un domani arriva il jack cuffie.
 #endif
