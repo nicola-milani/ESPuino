@@ -104,6 +104,7 @@ static void handleGetMediaHubServers(AsyncWebServerRequest *request);
 static void handlePostMediaHubServers(AsyncWebServerRequest *request, JsonVariant &json);
 static void handleDeleteMediaHubServers(AsyncWebServerRequest *request);
 static void handleGetGenitori(AsyncWebServerRequest *request);                      // [BOX] task 6
+static void handleGetStatoBox(AsyncWebServerRequest *request);                      // [BOX] task 9b
 static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json);  // [BOX] task 6
 static void handleGetInfo(AsyncWebServerRequest *request);
 static void handleGetSettings(AsyncWebServerRequest *request);
@@ -453,7 +454,9 @@ void webserverStart(void) {
 				if (etag) {
 					response = request->beginResponse(304);
 				} else {
-					response = request->beginResponse(200, "text/html", (const uint8_t *) management_html_BIN, sizeof(management_html_BIN));
+					// [BOX] task 9b: la radice e' la pagina "casa", pensata per un genitore
+					// col telefono in mano. Le 11 linguette di ESPuino restano su /avanzate.
+					response = request->beginResponse(200, "text/html", (const uint8_t *) casa_html_BIN, sizeof(casa_html_BIN));
 					response->addHeader("Content-Encoding", "gzip");
 					response->addHeader("Cache-Control", "no-cache");
 					response->addHeader("ETag", gitRevShort);
@@ -464,7 +467,8 @@ void webserverStart(void) {
 				} else if (etag) {
 					response = request->beginResponse(304);
 				} else {
-					response = request->beginResponse(200, "text/html", (const uint8_t *) management_html_BIN, sizeof(management_html_BIN));
+					// [BOX] task 9b: vedi sopra, la radice e' la pagina "casa".
+					response = request->beginResponse(200, "text/html", (const uint8_t *) casa_html_BIN, sizeof(casa_html_BIN));
 					response->addHeader("Content-Encoding", "gzip");
 					response->addHeader("Cache-Control", "no-cache");
 					response->addHeader("ETag", gitRevShort);
@@ -482,6 +486,16 @@ void webserverStart(void) {
 				}
 			}
 			request->send(response);
+		});
+
+		// [BOX] task 9b: le impostazioni complete di ESPuino, dove la pagina "casa"
+		// manda col link in fondo. Prima stavano sulla radice.
+		wServer.on("/avanzate", HTTP_GET, [](AsyncWebServerRequest *request) {
+			AsyncWebServerResponse *response = request->beginResponse(200, "text/html", (const uint8_t *) management_html_BIN, sizeof(management_html_BIN));
+			response->addHeader("Content-Encoding", "gzip");
+			response->addHeader("Cache-Control", "no-cache");
+			request->send(response);
+			System_UpdateActivityTimer();
 		});
 
 		WWWData::registerRoutes(serveProgmemFiles);
@@ -625,6 +639,11 @@ void webserverStart(void) {
 
 		// [BOX] task 6: pagina "Controllo genitori"
 		wServer.on("/genitori", HTTP_GET, handleGetGenitori);
+		// [BOX] task 9b: tutto quello che la pagina "casa" mostra, in una
+		// chiamata sola. Il genitore apre la pagina col telefono: tre fetch e
+		// un websocket per riempire una schermata sarebbero tre occasioni di
+		// vederla a meta'.
+		wServer.on("/stato", HTTP_GET, handleGetStatoBox);
 		wServer.addHandler(new AsyncCallbackJsonWebHandler("/genitori", handlePostGenitori));
 
 		// MediaHub registered servers (concept §5.1)
@@ -2854,6 +2873,55 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request) {
 // Registered MediaHub servers (concept §5.1): pure Web-UI enrollment
 // convenience, never read by the runtime playback flow.
 // ============================================================
+// [BOX] task 9b — lo stato che la pagina "casa" mostra, in un colpo solo
+static void handleGetStatoBox(AsyncWebServerRequest *request) {
+	JsonDocument doc;
+	JsonObject root = doc.to<JsonObject>();
+
+	root["nome"] = Wlan_GetHostname();
+
+	JsonObject suona = root["suona"].to<JsonObject>();
+	const bool c_e_qualcosa = gPlayProperties.playlist && gPlayProperties.playlist->size() > 0;
+	suona["attivo"] = c_e_qualcosa;
+	suona["inPausa"] = gPlayProperties.pausePlay;
+	suona["titolo"] = gPlayProperties.title;
+	suona["traccia"] = gPlayProperties.currentTrackNumber + 1;
+	suona["tracce"] = c_e_qualcosa ? gPlayProperties.playlist->size() : 0;
+	suona["volume"] = AudioPlayer_GetCurrentVolume();
+	suona["volumeMassimo"] = AudioPlayer_GetMaxVolume();
+
+#ifdef MEASURE_BATTERY_VOLTAGE
+	const float livello = Battery_EstimateLevel();
+	root["batteria"] = (livello >= 0.0f) ? (uint8_t) (livello * 100.0f + 0.5f) : 255;
+	root["batteriaBassa"] = Battery_IsLow();
+#else
+	root["batteria"] = 255; // 255 = non misurabile su questa scheda
+	root["batteriaBassa"] = false;
+#endif
+
+	JsonObject rete = root["rete"].to<JsonObject>();
+	rete["ssid"] = Wlan_GetCurrentSSID();
+	rete["rssi"] = Wlan_GetRssi();
+
+	// L'ora e il riposo li sa il controllo genitori: e' lui la fonte di verita'
+	// su cosa il box concede adesso, non la pagina. In "casa" si mostra solo
+	// l'ora, non la data: a chi mette a letto un bambino serve quella.
+	struct tm adesso;
+	char orario[8] = "";
+	if (getLocalTime(&adesso, 50)) {
+		strftime(orario, sizeof(orario), "%H:%M", &adesso);
+	}
+	JsonObject ora = root["ora"].to<JsonObject>();
+	ora["testo"] = orario;
+	ora["affidabile"] = !ControlloGenitoriBox_OraNonAffidabile();
+	root["riposoBloccato"] = ControlloGenitoriBox_RiposoBloccato();
+
+	String out;
+	serializeJson(doc, out);
+	request->send(200, "application/json; charset=utf-8", out);
+	System_UpdateActivityTimer();
+}
+
 // [BOX] task 6 — controllo genitori
 // Un paio di rotte tutte nostre invece di infilarci nelle impostazioni
 // generali: si legge meglio e non rischia di rompere il resto.

@@ -28,6 +28,13 @@ HTML_DIR = ROOT_DIR / "html"
 BINARY_FILES = [
     Path("management.html"),
     Path("accesspoint.html"),
+    # [BOX] task 9b: la pagina "casa", servita su "/" al posto di
+    # management.html, che si sposta su "/avanzate". I caratteri sono
+    # ritagliati ai soli segni dell'italiano con pyftsubset: nella web UI
+    # non deve arrivare niente da internet.
+    Path("casa.html"),
+    Path("font/HankenGrotesk.woff2"),
+    Path("font/Baloo2-600.woff2"),
     Path("js/i18next.min.js"),
     Path("js/i18nextHttpBackend.min.js"),
     Path("REST_API.yaml"),
