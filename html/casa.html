@@ -125,6 +125,26 @@
 			overflow: hidden;
 		}
 
+		/* I tre tasti disegnati non sono un disegno: premendoli, il box
+		   obbedisce. Un genitore in cucina mette in pausa da li'. */
+		.tastoVivo {
+			cursor: pointer;
+			transition: opacity .12s ease;
+		}
+
+		.tastoVivo:hover {
+			opacity: .8;
+		}
+
+		.tastoVivo:active {
+			opacity: .55;
+		}
+
+		.tastoVivo:focus-visible {
+			outline: 2px solid var(--latte);
+			outline-offset: 2px;
+		}
+
 		.coperchio svg {
 			display: block;
 			/* Il box e' verticale (100 x 140): a larghezza piena la figura
@@ -515,49 +535,16 @@
 		}
 
 		/* ---------- barra del mockup (non fa parte del prodotto) ---------- */
-		.barra-mockup {
-			position: fixed;
-			inset: 0 0 auto 0;
-			display: flex;
-			gap: 0.3rem;
-			justify-content: center;
-			padding: 0.4rem;
-			background: #000;
-			color: #fff;
-			font-size: 0.75rem;
-			z-index: 20;
-		}
 
-		.barra-mockup button {
-			background: #222;
-			color: #ddd;
-			border: 1px solid #444;
-			border-radius: 0.5rem;
-			padding: 0.3rem 0.6rem;
-			font: inherit;
-			cursor: pointer;
-		}
 
-		.barra-mockup button[data-attivo] {
-			background: var(--ambra);
-			color: #231405;
-			border-color: var(--ambra);
-		}
 
-		.spazio-barra {
-			height: 2.2rem;
-		}
 	</style>
 </head>
 
 <body>
-	<nav class="barra-mockup" aria-label="Schermate del mockup">
-		<button data-vai="casa" data-attivo>casa</button>
-		<button data-vai="riposo">riposo</button>
-		<button data-vai="avvio">primo avvio</button>
-		<button data-vai="orologio">data e ora</button>
-	</nav>
-	<div class="spazio-barra"></div>
+	<!-- La barra "casa / riposo / primo avvio / data e ora" era un comando del
+	     mockup, per saltare fra le schermate mentre si disegnava. Sul box non
+	     esiste: quale schermata si vede lo decide lo stato, non un bottone. -->
 
 	<!-- ============================ CASA ============================ -->
 	<main class="schermo" id="casa" data-attivo>
@@ -584,9 +571,9 @@
 					<!-- LED di stato -->
 					<circle id="led" cx="92" cy="14" r="2" fill="#3EA76B" />
 					<!-- i tre tasti -->
-					<circle cx="18" cy="66" r="10" fill="#4A86B8" />
-					<circle cx="44" cy="66" r="10" fill="#4CAF6D" />
-					<circle id="tastoPlay" cx="76" cy="66" r="13" fill="#E87FA6" />
+					<circle id="tastoDaCapo" class="tastoVivo" cx="18" cy="66" r="10" fill="#4A86B8" role="button" tabindex="0" aria-label="Da capo" />
+					<circle id="tastoProssimo" class="tastoVivo" cx="44" cy="66" r="10" fill="#4CAF6D" role="button" tabindex="0" aria-label="Il prossimo" />
+					<circle id="tastoPlay" class="tastoVivo" cx="76" cy="66" r="13" fill="#E87FA6" role="button" tabindex="0" aria-label="Play e pausa" />
 					<!-- scanso della tessera, in basso -->
 					<rect x="5" y="84" width="90" height="56" rx="3" fill="#102520" />
 					<g id="ospite">
@@ -653,11 +640,14 @@
 				</svg>
 			<div class="stato">
 				<strong>È ora di dormire</strong>
-				<span>La storia di oggi è già stata raccontata. Riprende alle 15:30.</span>
+				<span>La storia di oggi è già stata raccontata.</span>
 			</div>
 			<div class="misure">
-				<span class="pila"><i style="--carica:61%"></i> <b>61%</b></span>
-				<span>nanna fino alle 15:30</span>
+				<!-- Niente orario di fine: il box non lo dice, e inventarlo
+				     sarebbe peggio che tacerlo. -->
+				<span class="pila" id="pilaRiposo" hidden><i id="pilaBarraRiposo"
+						style="--carica:0%"></i> <b id="pilaTestoRiposo">--</b></span>
+				<span>il blocco si toglie dalla nanna</span>
 			</div>
 		</div>
 		<div class="azioni">
@@ -754,8 +744,6 @@
 
 		function vai(nome) {
 			schermi.forEach(s => s.toggleAttribute('data-attivo', s.id === nome));
-			document.querySelectorAll('.barra-mockup button').forEach(b =>
-				b.toggleAttribute('data-attivo', b.dataset.vai === nome));
 			chiudi();
 			scrollTo(0, 0);
 		}
@@ -789,24 +777,41 @@
 			E('statoTitolo').textContent = titolo;
 			E('statoRiga').textContent = riga;
 
-			const pila = E('pila');
-			if (s.batteria === 255) {
-				pila.hidden = true;            // questa scheda non la misura
-			} else {
-				pila.hidden = false;
-				E('pilaBarra').style.setProperty('--carica', s.batteria + '%');
-				E('pilaTesto').textContent = s.batteria + '%';
+			// La batteria si mostra su tutte e due le schermate: quella del
+			// riposo e' la piu' probabile da guardare la sera.
+			for (const [pilaId, barraId, testoId] of [
+				['pila', 'pilaBarra', 'pilaTesto'],
+				['pilaRiposo', 'pilaBarraRiposo', 'pilaTestoRiposo'],
+			]) {
+				const pila = E(pilaId);
+				if (!pila) { continue; }
+				if (s.batteria === 255) {
+					pila.hidden = true;        // questa scheda non la misura
+				} else {
+					pila.hidden = false;
+					E(barraId).style.setProperty('--carica', s.batteria + '%');
+					E(testoId).textContent = s.batteria + '%';
+				}
 			}
 			E('misuraStato').textContent = s.batteriaBassa ? 'batteria quasi scarica' : '';
 			E('misuraRete').textContent = s.rete && s.rete.ssid ? s.rete.ssid : 'rete del box';
 			if (s.ora && s.ora.testo) { E('oraBox').textContent = s.ora.testo; }
 			if (s.ora && s.ora.affidabile === false) { E('oraBox').textContent = 'non impostata'; }
 
-			// Fra "casa" e "riposo" si passa da soli; se il genitore sta
-			// guardando un'altra schermata non gliela si porta via di mano.
+			// Fra "casa" e "riposo" si passa da soli, ma con tre riguardi, tutti
+			// imparati provando la pagina col mouse:
+			//  - se il genitore sta su un'altra schermata non gliela si porta
+			//    via di mano;
+			//  - se ha un foglio aperto non glielo si chiude sotto le dita
+			//    (vai() chiama chiudi());
+			//  - e soprattutto non si chiama vai() se la schermata e' gia'
+			//    quella giusta, altrimenti ogni tre secondi si rifa' tutto.
 			const attivo = document.querySelector('.schermo[data-attivo]');
-			if (attivo && (attivo.id === 'casa' || attivo.id === 'riposo')) {
-				vai(s.riposoBloccato ? 'riposo' : 'casa');
+			const voluta = s.riposoBloccato ? 'riposo' : 'casa';
+			const foglioAperto = foglio.hasAttribute('data-aperto');
+			if (attivo && attivo.id !== voluta && !foglioAperto
+				&& (attivo.id === 'casa' || attivo.id === 'riposo')) {
+				vai(voluta);
 			}
 		}
 
@@ -825,6 +830,64 @@
 			} catch (e) {
 				nonRisponde();
 			}
+		}
+
+		/* La nanna la decide il controllo genitori, che e' gia' nel firmware:
+		   qui si manda solo l'azione. "Fino al mattino" non e' un numero di
+		   minuti scelto a caso - lo sa il box, che ha l'ora del mattino fra
+		   le sue regole: si manda 0 e ci pensa lui. */
+		async function nanna(valore) {
+			const esito = E('esitoNanna');
+			// 0 = fino al mattino: lo dice il firmware stesso nel suo log.
+			const richiesta = (valore === 'annulla')
+				? { annullaNanna: true }
+				: { nannaMinuti: (valore === 'mattino') ? 0 : Number(valore) };
+			if (esito) { esito.textContent = 'Un momento…'; }
+			try {
+				const r = await fetch('/genitori', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(richiesta)
+				});
+				if (!r.ok) { throw new Error(r.status); }
+				if (esito) {
+					esito.textContent = (valore === 'annulla')
+						? 'Blocco tolto.'
+						: 'Nanna attiva. Il bambino sente il messaggio che avete registrato.';
+				}
+				aggiorna();
+			} catch (e) {
+				if (esito) { esito.textContent = 'Non sono riuscito a parlare col box. Riprova.'; }
+			}
+		}
+
+		corpo.addEventListener('click', (ev) => {
+			const b = ev.target.closest('[data-nanna]');
+			if (b) { nanna(b.dataset.nanna); }
+		});
+
+		/* I tasti disegnati comandano il box. La lista e' chiusa a tre anche
+		   qui, come nel firmware: sono gli stessi che ha il bambino. */
+		const COMANDI = { tastoPlay: 'playpausa', tastoDaCapo: 'dacapo', tastoProssimo: 'prossimo' };
+
+		async function premi(id) {
+			try {
+				const r = await fetch('/comando?c=' + COMANDI[id], { method: 'POST' });
+				if (r.status === 409) {
+					E('statoRiga').textContent = 'Il box è in riposo: cambia la nanna per sbloccarlo';
+					return;
+				}
+			} catch (e) { /* lo dira' il prossimo giro di aggiorna() */ }
+			setTimeout(aggiorna, 250);   // il box ci mette un attimo a cambiare stato
+		}
+
+		for (const id of Object.keys(COMANDI)) {
+			const el = E(id);
+			if (!el) { continue; }
+			el.addEventListener('click', () => premi(id));
+			el.addEventListener('keydown', (ev) => {
+				if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); premi(id); }
+			});
 		}
 
 		aggiorna();
@@ -868,13 +931,15 @@
 				<h2 id="foglioTitolo">Nanna</h2>
 				<p>Blocca subito, senza toccare le fasce impostate.</p>
 				<div class="scelte">
-					<button class="scelta" data-poi="fatto">30 minuti</button>
-					<button class="scelta" data-poi="fatto">60 minuti</button>
-					<button class="scelta" data-poi="fatto">90 minuti</button>
-					<button class="scelta" data-poi="fatto">Fino al mattino</button>
+					<button class="scelta" data-nanna="30">30 minuti</button>
+					<button class="scelta" data-nanna="60">60 minuti</button>
+					<button class="scelta" data-nanna="90">90 minuti</button>
+					<button class="scelta" data-nanna="mattino">Fino al mattino</button>
 				</div>
+				<button class="secondario" data-nanna="annulla">Togli il blocco</button>
 				<button class="primario" data-poi="fasce">Imposta le fasce di riposo</button>
-				<button class="secondario" data-chiudi>Chiudi</button>`,
+				<button class="secondario" data-chiudi>Chiudi</button>
+				<p class="esito" id="esitoNanna"></p>`,
 			fasce: () => `
 				<h2 id="foglioTitolo">Fasce di riposo</h2>
 				<p>Dentro una fascia si ascolta una storia sola, poi il box riposa.</p>

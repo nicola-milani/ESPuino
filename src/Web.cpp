@@ -105,6 +105,7 @@ static void handlePostMediaHubServers(AsyncWebServerRequest *request, JsonVarian
 static void handleDeleteMediaHubServers(AsyncWebServerRequest *request);
 static void handleGetGenitori(AsyncWebServerRequest *request);                      // [BOX] task 6
 static void handleGetStatoBox(AsyncWebServerRequest *request);                      // [BOX] task 9b
+static void handlePostComando(AsyncWebServerRequest *request);                      // [BOX] task 9b
 static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json);  // [BOX] task 6
 static void handleGetInfo(AsyncWebServerRequest *request);
 static void handleGetSettings(AsyncWebServerRequest *request);
@@ -644,6 +645,11 @@ void webserverStart(void) {
 		// un websocket per riempire una schermata sarebbero tre occasioni di
 		// vederla a meta'.
 		wServer.on("/stato", HTTP_GET, handleGetStatoBox);
+		// [BOX] task 9b: i tre tasti disegnati sulla pagina "casa" comandano il
+		// box davvero. ESPuino ha gia' una strada (websocket "controls"), ma
+		// quella accetta qualunque comando: qui la lista e' chiusa a tre, e si
+		// legge dal codice cosa la pagina puo' fare.
+		wServer.on("/comando", HTTP_POST, handlePostComando);
 		wServer.addHandler(new AsyncCallbackJsonWebHandler("/genitori", handlePostGenitori));
 
 		// MediaHub registered servers (concept §5.1)
@@ -2873,6 +2879,42 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request) {
 // Registered MediaHub servers (concept §5.1): pure Web-UI enrollment
 // convenience, never read by the runtime playback flow.
 // ============================================================
+// [BOX] task 9b — i tre tasti del fronte, premuti dal telefono
+static void handlePostComando(AsyncWebServerRequest *request) {
+	if (!request->hasParam("c")) {
+		request->send(400, "text/plain; charset=utf-8", "manca il comando");
+		return;
+	}
+	const String c = request->getParam("c")->value();
+
+	// Lista chiusa: sono gli stessi tre tasti che ha il bambino sul fronte,
+	// niente di piu'. Un genitore in cucina deve poter mettere in pausa, non
+	// riconfigurare il box da una richiesta GET.
+	uint16_t comando;
+	if (c == "playpausa") {
+		comando = CMD_PLAYPAUSE;
+	} else if (c == "dacapo") {
+		comando = CMD_FIRSTTRACK;
+	} else if (c == "prossimo") {
+		comando = CMD_NEXTTRACK;
+	} else {
+		request->send(400, "text/plain; charset=utf-8", "comando sconosciuto");
+		return;
+	}
+
+	// Il controllo genitori vale anche di qui: se il box e' in riposo bloccato
+	// non lo si sblocca dal telefono premendo play, lo si sblocca cambiando le
+	// regole. Altrimenti la fascia di riposo sarebbe un suggerimento.
+	if (!ControlloGenitoriBox_PuoComandare()) {
+		request->send(409, "text/plain; charset=utf-8", "il box e' in riposo");
+		return;
+	}
+
+	Cmd_Action(comando);
+	request->send(204);
+	System_UpdateActivityTimer();
+}
+
 // [BOX] task 9b — lo stato che la pagina "casa" mostra, in un colpo solo
 static void handleGetStatoBox(AsyncWebServerRequest *request) {
 	JsonDocument doc;

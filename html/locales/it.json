@@ -28,7 +28,7 @@
 	},
 	"nav": {
 		"control": "Comandi",
-		"rfid": "Statuine",
+		"rfid": "Tessere",
 		"wifi": "WiFi",
 		"mqtt": "MQTT",
 		"ftp": "FTP",
