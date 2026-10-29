@@ -59,6 +59,31 @@ void System_Init_Rfid_Prefs(void) {
 	}
 }
 
+// [BOX] task 9b — fuso orario salvato in NVS, con il valore compilato come
+// ripiego: cosi' un box che non e' mai stato configurato parte comunque
+// sull'ora giusta per noi.
+static String gFusoOrario;
+
+const char *System_GetTimeZone(void) {
+	if (gFusoOrario.isEmpty()) {
+		gFusoOrario = gPrefsSettings.getString("timeZone", timeZone);
+	}
+	return gFusoOrario.c_str();
+}
+
+bool System_SetTimeZone(const char *tz) {
+	if (tz == nullptr || strlen(tz) < 3 || strlen(tz) > 63) {
+		return false;
+	}
+	if (gPrefsSettings.putString("timeZone", tz) == 0) {
+		return false;
+	}
+	gFusoOrario = tz;
+	setenv("TZ", tz, 1);
+	tzset();
+	return true;
+}
+
 void System_Init(void) {
 	srand(esp_random());
 

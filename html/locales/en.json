@@ -211,6 +211,10 @@
 			"success": "Connected! The box got IP {{ip}}. It will now leave setup mode — reconnect your phone to your normal WiFi and reach the box at http://{{ip}}",
 			"reachTitle": "Reach your ESPuino",
 			"reachHint": "Your ESPuino is now on your WiFi at this address. Copy it or save it as a bookmark — the setup network is closing."
+		},
+		"timezone": {
+			"title": "Time zone",
+			"hint": "Used by the bedtime rules: with the wrong zone the quiet hours fire at the wrong time."
 		}
 	},
 	"control": {

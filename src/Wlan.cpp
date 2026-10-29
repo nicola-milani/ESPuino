@@ -528,7 +528,8 @@ void handleWifiStateConnectionSuccess() {
 	// set notification call-back function
 	sntp_set_time_sync_notification_cb(ntpTimeAvailable);
 	// start NTP request with timezone
-	configTzTime(timeZone, "de.pool.ntp.org", "0.pool.ntp.org", "ptbtime1.ptb.de");
+	// [BOX] task 9b: fuso dal NVS, e server NTP italiani invece dei tedeschi.
+	configTzTime(System_GetTimeZone(), "it.pool.ntp.org", "0.pool.ntp.org", "europe.pool.ntp.org");
 #ifdef MDNS_ENABLE
 	// zero conf, make device available as <hostname>.local
 	const String hostname = getHostname();

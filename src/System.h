@@ -6,6 +6,11 @@ extern Preferences gPrefsSettings;
 
 void System_Init_Rfid_Prefs(void);
 void System_Init(void);
+// [BOX] task 9b: il fuso orario era compilato nel firmware (settings.h).
+// Un box regalato a chi sta in un altro fuso non si poteva sistemare senza
+// ricompilare, e la fascia della nanna sarebbe stata sfasata di ore.
+const char *System_GetTimeZone(void);
+bool System_SetTimeZone(const char *tz);
 void System_Cyclic(void);
 void System_UpdateActivityTimer(void);
 void System_RequestSleep(void);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="it">
 
 <head>
 	<title data-i18n="wifi.title"></title>
@@ -9,6 +9,43 @@
 	<script src="/js/i18nextHttpBackend.min.js"></script>
 	<script src="/js/loc_i18next.min.js"></script>
 	<style>
+		/* [BOX] task 9b: i colori del box anche qui. Si resta leggeri apposta:
+		   il portale captive di iOS e Android e' un browser ristretto, con un
+		   tempo di caricamento stretto, e ESPuino serve questa pagina invece di
+		   management.html proprio per quello. */
+		body {
+			background: #10211F;
+			color: #EFEDE4;
+			font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+		}
+
+		.box {
+			background: #16302C;
+			border: 1px solid #2A4A43;
+			border-radius: 16px;
+		}
+
+		h1 {
+			font-size: 1.25rem;
+		}
+
+		.btn {
+			background: #E9A95C;
+			color: #10211F;
+			font-weight: 600;
+		}
+
+		select {
+			width: 90%;
+			height: 44px;
+			border-radius: 4px;
+			margin: 10px auto;
+			font-size: 15px;
+			background: #f1f1f1;
+			border: 0;
+			padding: 0 10px;
+		}
+
 		input {
 			width: 90%;
 			height: 44px;
@@ -84,6 +121,7 @@
 	<form id="settings" action="#wifiConfig" class="box" method="POST" onsubmit="wifiConfig(); return false">
 		<div style="text-align:right">
 			<select id="langSel" style="width:auto;height:28px;margin:0;padding:0 5px;font-size:13px">
+				<option value="it">Italiano</option>
 				<option value="de">Deutsch</option>
 				<option value="en">English</option>
 				<option value="fr">Français</option>
@@ -102,6 +140,16 @@
 		<input type="text" id="hostname" name="hostname" value="espuino"
 			pattern="^[0-9a-zA-Z][0-9a-zA-Z\\-]{0,30}[0-9a-zA-Z]" required>
 		<br>
+		<label for="fuso" data-i18n="wifi.timezone.title"></label>: <br>
+		<select id="fuso" name="fuso">
+			<option value="CET-1CEST,M3.5.0,M10.5.0/3" selected>Italia · Europa centrale</option>
+			<option value="GMT0BST,M3.5.0/1,M10.5.0">Regno Unito · Irlanda · Portogallo</option>
+			<option value="EET-2EEST,M3.5.0/3,M10.5.0/4">Grecia · Finlandia · Romania</option>
+			<option value="WET0WEST,M3.5.0/1,M10.5.0">Isole Canarie</option>
+			<option value="EST5EDT,M3.2.0,M11.1.0">Stati Uniti · costa est</option>
+			<option value="UTC0">Ora universale (UTC)</option>
+		</select>
+		<p style="font-size:13px;margin:4px 0 0" data-i18n="wifi.timezone.hint"></p>
 		<br>
 		<input type="checkbox" id="scan_wifi_on_start" name="scan_wifi_on_start" value="false">
 		<label for="scan_wifi_on_start" data-i18n="wifi.scan.enabled"></label>
@@ -320,6 +368,14 @@
 				},
 				body: JSON.stringify(myObj)
 			});
+			// [BOX] task 9b: il fuso orario. Fino al 29 ottobre era compilato nel
+			// firmware: un box portato in un altro fuso aveva le fasce della
+			// nanna sfasate di ore, e non c'era modo di sistemarlo.
+			try {
+				await fetch("/fuso?tz=" + encodeURIComponent(document.getElementById("fuso").value), { method: "POST" });
+			} catch (e) {
+				// non blocca il collegamento: il fuso si cambia anche dopo
+			}
 			// try the credentials right away, while the AP stays up
 			document.getElementById("connstatus").style.display = "none";
 			const response = await fetch("/wifitest", {

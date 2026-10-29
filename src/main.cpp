@@ -204,7 +204,7 @@ void setup() {
 	Log_Printf(LOGLEVEL_DEBUG, "Flash-size: %u bytes", ESP.getFlashChipSize());
 
 	// setup timezone & show internal RTC date/time if available
-	setenv("TZ", timeZone, 1);
+	setenv("TZ", System_GetTimeZone(), 1); // [BOX] task 9b: dal NVS, non compilato
 	tzset();
 	struct tm timeinfo;
 	if (getLocalTime(&timeinfo, 5)) {

@@ -211,6 +211,10 @@
 			"success": "Collegato! Il box ha preso l'indirizzo {{ip}}. Ora esce dalla modalità di configurazione: rimetti il telefono sul WiFi di casa e raggiungi il box su http://{{ip}}",
 			"reachTitle": "Come raggiungere ESPuino",
 			"reachHint": "Adesso ESPuino è sulla tua rete a questo indirizzo. Copialo o salvalo tra i preferiti: la rete di configurazione sta per chiudersi."
+		},
+		"timezone": {
+			"title": "Fuso orario",
+			"hint": "Serve alla nanna: con il fuso sbagliato le fasce di riposo scattano all'ora sbagliata."
 		}
 	},
 	"control": {

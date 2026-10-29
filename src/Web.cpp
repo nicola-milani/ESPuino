@@ -106,6 +106,7 @@ static void handleDeleteMediaHubServers(AsyncWebServerRequest *request);
 static void handleGetGenitori(AsyncWebServerRequest *request);                      // [BOX] task 6
 static void handleGetStatoBox(AsyncWebServerRequest *request);                      // [BOX] task 9b
 static void handlePostComando(AsyncWebServerRequest *request);                      // [BOX] task 9b
+static void handlePostFuso(AsyncWebServerRequest *request);                         // [BOX] task 9b
 static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json);  // [BOX] task 6
 static void handleGetInfo(AsyncWebServerRequest *request);
 static void handleGetSettings(AsyncWebServerRequest *request);
@@ -650,6 +651,9 @@ void webserverStart(void) {
 		// quella accetta qualunque comando: qui la lista e' chiusa a tre, e si
 		// legge dal codice cosa la pagina puo' fare.
 		wServer.on("/comando", HTTP_POST, handlePostComando);
+		// [BOX] task 9b: il fuso orario, che fino al 29 ottobre era compilato
+		// nel firmware. Lo chiede la pagina del primo avvio.
+		wServer.on("/fuso", HTTP_POST, handlePostFuso);
 		wServer.addHandler(new AsyncCallbackJsonWebHandler("/genitori", handlePostGenitori));
 
 		// MediaHub registered servers (concept §5.1)
@@ -2879,6 +2883,20 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request) {
 // Registered MediaHub servers (concept §5.1): pure Web-UI enrollment
 // convenience, never read by the runtime playback flow.
 // ============================================================
+// [BOX] task 9b — il fuso orario
+static void handlePostFuso(AsyncWebServerRequest *request) {
+	if (!request->hasParam("tz")) {
+		request->send(400, "text/plain; charset=utf-8", "manca il fuso");
+		return;
+	}
+	if (!System_SetTimeZone(request->getParam("tz")->value().c_str())) {
+		request->send(400, "text/plain; charset=utf-8", "fuso non valido");
+		return;
+	}
+	request->send(204);
+	System_UpdateActivityTimer();
+}
+
 // [BOX] task 9b — i tre tasti del fronte, premuti dal telefono
 static void handlePostComando(AsyncWebServerRequest *request) {
 	if (!request->hasParam("c")) {
@@ -2962,6 +2980,7 @@ static void handleGetStatoBox(AsyncWebServerRequest *request) {
 	}
 	JsonObject ora = root["ora"].to<JsonObject>();
 	ora["testo"] = orario;
+	ora["fuso"] = System_GetTimeZone();
 	ora["affidabile"] = !ControlloGenitoriBox_OraNonAffidabile();
 	root["riposoBloccato"] = ControlloGenitoriBox_RiposoBloccato();
 
