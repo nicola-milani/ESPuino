@@ -125,6 +125,31 @@
 			overflow: hidden;
 		}
 
+		.campo {
+			width: 100%;
+			min-height: var(--tocco);
+			padding: 0.75rem 0.9rem;
+			background: var(--notte);
+			color: inherit;
+			border: 1px solid var(--riga);
+			border-radius: 1rem;
+			font: inherit;
+		}
+
+		.barra-avanzamento {
+			height: 0.5rem;
+			border-radius: 999px;
+			background: var(--notte);
+			overflow: hidden;
+		}
+
+		.barra-avanzamento i {
+			display: block;
+			height: 100%;
+			background: var(--ambra);
+			transition: width .2s ease;
+		}
+
 		/* I tre tasti disegnati non sono un disegno: premendoli, il box
 		   obbedisce. Un genitore in cucina mette in pausa da li'. */
 		.tastoVivo {
@@ -833,6 +858,115 @@
 		}
 
 		/* ---------------------------------------------------------------
+		   Caricare le storie. ESPuino vuole i file uno alla volta, come
+		   corpo grezzo, col percorso di destinazione nella query: il
+		   doppio buffer e il task che scrive sono condivisi, e due
+		   caricamenti insieme si pestano i piedi.
+		   Le cartelle mancanti le crea il firmware da solo, quindi per una
+		   storia nuova basta scrivere il nome.
+		   --------------------------------------------------------------- */
+		async function mostraDoveCaricare() {
+			const dove = E('doveCaricare');
+			if (!dove) { return; }
+			let cartelle = [];
+			try {
+				const r = await fetch('/explorer?path=%2F', { cache: 'no-store' });
+				cartelle = (await r.json()).filter(v => v.dir).map(v => v.name);
+			} catch (e) { /* si continua: si puo' sempre creare una cartella nuova */ }
+			dove.innerHTML = `
+				${cartelle.map(c => `<button class="voce" data-dove="${c}"><span>${c}</span><small>aggiungi a questa</small></button>`).join('')}
+				<div class="voce">
+					<input id="nuovaCartella" class="campo" type="text" placeholder="Nome di una storia nuova"
+						autocomplete="off" inputmode="text">
+					<button class="primario" data-dove="">Crea e carica</button>
+				</div>`;
+		}
+
+		function scegliFile(cartella) {
+			const nome = cartella || (E('nuovaCartella') ? E('nuovaCartella').value.trim() : '');
+			if (!nome) {
+				apri(pannelli.carica());
+				mostraDoveCaricare();
+				return;
+			}
+			apri(`
+				<h2 id="foglioTitolo">Carica in «${nome}»</h2>
+				<p>Scegli i file audio dal telefono o dal computer.</p>
+				<input id="fileAudio" class="campo" type="file" multiple accept="audio/*,.mp3,.m4a,.aac">
+				<div class="barra-avanzamento" hidden id="barraCarica"><i id="avanzamento" style="width:0%"></i></div>
+				<p class="esito" id="esitoCarica"></p>
+				<button class="primario" id="viaCarica">Carica</button>
+				<button class="secondario" data-chiudi>Annulla</button>`);
+			E('viaCarica').addEventListener('click', () => carica(nome));
+		}
+
+		function carica(cartella) {
+			const scelti = E('fileAudio') ? [...E('fileAudio').files] : [];
+			const esito = E('esitoCarica');
+			if (!scelti.length) { esito.textContent = 'Non hai scelto nessun file.'; return; }
+			const totale = scelti.reduce((n, f) => n + f.size, 0);
+			let fatti = 0;
+			E('barraCarica').hidden = false;
+			E('viaCarica').disabled = true;
+
+			// Uno alla volta, in coda: in parallelo ESPuino non regge.
+			function caricaProssimo(i) {
+				if (i >= scelti.length) {
+					apri(`
+						<h2 id="foglioTitolo">Caricate</h2>
+						<p>${scelti.length} file in «${cartella}». Adesso serve una tessera che la racconti.</p>
+						<button class="primario" data-apre="storia">Associa una tessera</button>
+						<button class="secondario" data-chiudi>Più tardi</button>`);
+					return;
+				}
+				const f = scelti[i];
+				const xhr = new XMLHttpRequest();
+				xhr.open('POST', '/explorer?path=' + encodeURIComponent('/' + cartella + '/' + f.name));
+				xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+				xhr.upload.addEventListener('progress', (ev) => {
+					if (!ev.lengthComputable) { return; }
+					const q = Math.round(((fatti + ev.loaded) / totale) * 100);
+					const barra = E('avanzamento');
+					if (barra) { barra.style.width = q + '%'; }
+					if (esito) { esito.textContent = `${f.name} — ${q}%`; }
+				});
+				xhr.onload = () => {
+					if (xhr.status >= 200 && xhr.status < 300) {
+						fatti += f.size;
+						caricaProssimo(i + 1);
+					} else if (esito) {
+						esito.textContent = `Non sono riuscito a caricare ${f.name}.`;
+						E('viaCarica').disabled = false;
+					}
+				};
+				xhr.onerror = () => {
+					if (esito) { esito.textContent = `Si è interrotto su ${f.name}.`; }
+					E('viaCarica').disabled = false;
+				};
+				xhr.send(f);
+			}
+			caricaProssimo(0);
+		}
+
+		/* Un gestore solo per tutto quello che si clicca dentro il foglio.
+		   **stopPropagation e' obbligatorio**: questi gesti sostituiscono il
+		   contenuto del foglio, e quando il clic arriva al gestore globale
+		   l'elemento premuto non e' piu' nel DOM - quindi "closest('#foglio')"
+		   e' null, il gestore lo scambia per un clic fuori e chiude tutto. */
+		corpo.addEventListener('click', (ev) => {
+			const dove = ev.target.closest('[data-dove]');
+			if (dove) { ev.stopPropagation(); scegliFile(dove.dataset.dove); return; }
+			const cartella = ev.target.closest('[data-cartella]');
+			if (cartella) {
+				ev.stopPropagation();
+				associa(cartella.dataset.id, cartella.dataset.cartella, cartella.dataset.tipo);
+				return;
+			}
+			const sonno = ev.target.closest('[data-nanna]');
+			if (sonno) { ev.stopPropagation(); nanna(sonno.dataset.nanna); }
+		});
+
+		/* ---------------------------------------------------------------
 		   Associare una tessera. Tre passi, e il primo non si puo' saltare:
 		   bisogna sapere QUALE tessera, e lo sa solo il box quando gliela
 		   appoggi. Si guarda /stato piu' spesso del solito finche' non
@@ -923,11 +1057,6 @@
 			}
 		}
 
-		corpo.addEventListener('click', (ev) => {
-			const v = ev.target.closest('[data-cartella]');
-			if (v) { associa(v.dataset.id, v.dataset.cartella, v.dataset.tipo); }
-		});
-
 		/* La nanna la decide il controllo genitori, che e' gia' nel firmware:
 		   qui si manda solo l'azione. "Fino al mattino" non e' un numero di
 		   minuti scelto a caso - lo sa il box, che ha l'ora del mattino fra
@@ -956,11 +1085,6 @@
 				if (esito) { esito.textContent = 'Non sono riuscito a parlare col box. Riprova.'; }
 			}
 		}
-
-		corpo.addEventListener('click', (ev) => {
-			const b = ev.target.closest('[data-nanna]');
-			if (b) { nanna(b.dataset.nanna); }
-		});
 
 		/* I tasti disegnati comandano il box. La lista e' chiusa a tre anche
 		   qui, come nel firmware: sono gli stessi che ha il bambino. */
@@ -1017,14 +1141,14 @@
 					<button class="voce"><span>Aggiungi una fascia</span><small></small></button>
 				</div>
 				<button class="secondario" data-chiudi>Chiudi</button>`,
-			carica: () => `
+			carica: () => (setTimeout(mostraDoveCaricare, 0), `
 				<h2 id="foglioTitolo">Carica storie</h2>
-				<div class="elenco">
-					<button class="voce" data-poi="fatto"><span>Scegli i file dal telefono</span><small>mp3, m4a</small></button>
-					<button class="voce" data-poi="fatto"><span>Scegli una cartella intera</span><small>dal computer</small></button>
-				</div>
-				<p class="nota">Oltre i 50 MB conviene togliere la microSD e copiare dal computer: ci mette un minuto invece di mezz'ora.</p>
-				<button class="secondario" data-chiudi>Chiudi</button>`,
+				<p>Prima dove, poi quali file.</p>
+				<div class="elenco" id="doveCaricare"><p>Leggo la microSD…</p></div>
+				<p class="nota">Passa tutto da qui: la microSD sta dentro, dietro le viti, e
+				non si toglie. La prima volta conviene riempirla al computer prima di
+				chiudere il case.</p>
+				<button class="secondario" data-chiudi>Chiudi</button>`),
 			fatto: () => `
 				<h2 id="foglioTitolo">Fatto</h2>
 				<div class="attesa">
