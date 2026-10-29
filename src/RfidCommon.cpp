@@ -45,6 +45,10 @@ void Rfid_PreferenceLookupHandler(void) {
 		if (!s.compareTo("-1")) {
 			Log_Println(rfidTagUnknownInNvs, LOGLEVEL_ERROR);
 			System_IndicateError();
+			// [BOX] task 4/8: un suono diverso per la tessera sconosciuta.
+			// Senza, una tessera non ancora associata suona identica a una
+			// lettura fallita, e il bambino non sa se insistere.
+			Box_SuonoTessera(false);
 			// allow to escape from bluetooth mode with an unknown card, switch back to normal mode
 			System_SetOperationMode(OPMODE_NORMAL);
 			return;
@@ -99,6 +103,11 @@ void Rfid_PreferenceLookupHandler(void) {
 				// Only here, past the dontAcceptRfidTwice dedup: a tag that was refused as a duplicate
 				// did not do anything, so it must not be acknowledged as if it had.
 				Led_IndicateRfidTagAccepted();
+				// [BOX] task 4: conferma morbida della lettura. Serve a
+				// riempire i due o tre secondi fra l'appoggio della tessera e
+				// l'inizio della storia: per un bambino di due anni due
+				// secondi di silenzio vogliono dire "non ha funzionato".
+				Box_SuonoTessera(true);
 
 	#ifdef MQTT_ENABLE
 				publishMqtt(topicRfid, gCurrentRfidTagId, false);
@@ -128,6 +137,25 @@ void Rfid_PreferenceLookupHandler(void) {
 		}
 	}
 #endif
+}
+
+// [BOX] Riproduce il suono di conferma, se i genitori l'hanno acceso dalla
+// web UI. I file stanno sulla microSD, in /sistema: si registrano col task 4
+// e vanno incisi 6 dB sotto le storie, perche' l'annuncio esce al volume
+// corrente e un "bip" piu' forte della fiaba fa sobbalzare.
+void Box_SuonoTessera(bool riconosciuta) {
+	if (!gPrefsSettings.getBool("boxSuonoTessera", false)) {
+		return;
+	}
+	// Tempo morto: un bambino appoggia e solleva la tessera venti volte per
+	// sentire il suono. Senza questo, la conferma diventa il gioco.
+	static uint32_t ultimoSuono = 0;
+	const uint32_t adesso = millis();
+	if (ultimoSuono != 0 && (adesso - ultimoSuono) < 3000) {
+		return;
+	}
+	ultimoSuono = adesso;
+	AudioPlayer_PlayAnnouncement(riconosciuta ? "/sistema/tessera-ok.mp3" : "/sistema/tessera-sconosciuta.mp3");
 }
 
 void Rfid_ResetOldRfid() {

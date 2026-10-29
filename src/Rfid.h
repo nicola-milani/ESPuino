@@ -5,6 +5,9 @@ constexpr uint8_t cardIdStringSize = (cardIdSize * 3u) + 1u;
 
 extern char gCurrentRfidTagId[cardIdStringSize];
 
+// [BOX] task 4: conferma sonora della lettura di una tessera.
+void Box_SuonoTessera(bool riconosciuta);
+
 void Rfid_ResetOldRfid(void);
 void Rfid_ResetLastTag(void);
 // Reader-task internal: returns true once after Rfid_ResetLastTag() was called.

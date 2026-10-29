@@ -163,6 +163,31 @@ void applicaDecisione(const box::Decisione &d) {
 	salvaStato();
 }
 
+// ------------------------------------------------------------------
+// Dissolvenza dell'ultima storia concessa
+// ------------------------------------------------------------------
+// La logica pura decide *se* sfumare (d.dissolvenzaFinale, una delle 47
+// verifiche); qui si fa *come*. Fino al 29 ottobre nessuno leggeva quel
+// campo: l'impostazione stava nella web UI, la decisione si calcolava, e
+// il box non sfumava niente. Era una promessa fatta ai genitori e non
+// mantenuta.
+//
+// L'idea e' che l'ultima storia prima del riposo non si interrompa di
+// colpo - a un bambino di due anni il silenzio improvviso sembra un
+// guasto - ma cali piano fino a spegnersi.
+bool gDissolvenzaAttiva = false;
+uint8_t gVolumePrimaDellaDissolvenza = 0;
+
+void fermaDissolvenza() {
+	if (!gDissolvenzaAttiva) {
+		return;
+	}
+	// Il volume si rimette com'era: se si uscisse di qui con il volume a
+	// zero, il box resterebbe muto per sempre e sembrerebbe rotto.
+	AudioPlayer_SetCurrentVolume(gVolumePrimaDellaDissolvenza);
+	gDissolvenzaAttiva = false;
+}
+
 } // namespace
 
 // ------------------------------------------------------------------
@@ -197,6 +222,15 @@ bool ControlloGenitoriBox_PuoPartire(const char *uid) {
 	applicaDecisione(d);
 
 	if (d.esito != box::Esito::SoloMessaggio) {
+		// Una storia nuova parte sempre a volume pieno: se la precedente era
+		// stata sfumata, quel volume non se lo porta dietro.
+		fermaDissolvenza();
+		gDissolvenzaAttiva = d.dissolvenzaFinale && (gRegole.dissolvenzaSecondi > 0);
+		if (gDissolvenzaAttiva) {
+			gVolumePrimaDellaDissolvenza = AudioPlayer_GetCurrentVolume();
+			Log_Printf(LOGLEVEL_NOTICE, "Controllo genitori: ultima storia concessa, sfumo gli ultimi %d s",
+				gRegole.dissolvenzaSecondi);
+		}
 		return true;
 	}
 
@@ -207,6 +241,30 @@ bool ControlloGenitoriBox_PuoPartire(const char *uid) {
 	return false;
 }
 
+// Chiamata dal loop: guarda quanto manca alla fine e cala il volume.
+void ControlloGenitoriBox_Cyclic(void) {
+	if (!gDissolvenzaAttiva) {
+		return;
+	}
+	const uint32_t durata = AudioPlayer_GetFileDuration();
+	const uint32_t adessoSec = AudioPlayer_GetCurrentTime();
+	// Durata sconosciuta (stream, file senza intestazione utile): non si
+	// sfuma al buio, si lascia suonare.
+	if (durata == 0 || adessoSec > durata) {
+		return;
+	}
+	const uint32_t restano = durata - adessoSec;
+	const uint32_t finestra = (uint32_t) gRegole.dissolvenzaSecondi;
+	if (restano > finestra) {
+		return;
+	}
+	// Lineare sul numero di passi del volume: basta, e si sente.
+	const uint16_t voluto = (uint16_t) ((gVolumePrimaDellaDissolvenza * restano + finestra / 2) / finestra);
+	if (voluto != AudioPlayer_GetCurrentVolume()) {
+		AudioPlayer_SetCurrentVolume((uint8_t) voluto);
+	}
+}
+
 bool ControlloGenitoriBox_PuoComandare(void) {
 	if (gControllo == nullptr) {
 		return true;
@@ -214,6 +272,15 @@ bool ControlloGenitoriBox_PuoComandare(void) {
 	const box::Decisione d = gControllo->tastoPremuto(adesso());
 	applicaDecisione(d);
 	if (d.esito != box::Esito::SoloMessaggio) {
+		// Una storia nuova parte sempre a volume pieno: se la precedente era
+		// stata sfumata, quel volume non se lo porta dietro.
+		fermaDissolvenza();
+		gDissolvenzaAttiva = d.dissolvenzaFinale && (gRegole.dissolvenzaSecondi > 0);
+		if (gDissolvenzaAttiva) {
+			gVolumePrimaDellaDissolvenza = AudioPlayer_GetCurrentVolume();
+			Log_Printf(LOGLEVEL_NOTICE, "Controllo genitori: ultima storia concessa, sfumo gli ultimi %d s",
+				gRegole.dissolvenzaSecondi);
+		}
 		return true;
 	}
 	riproduciMessaggioNanna();
@@ -230,6 +297,7 @@ void ControlloGenitoriBox_TagTolto(const char *uid) {
 }
 
 void ControlloGenitoriBox_StoriaFinita(void) {
+	fermaDissolvenza();
 	if (gControllo == nullptr) {
 		return;
 	}

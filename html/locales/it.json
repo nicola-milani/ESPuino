@@ -67,7 +67,9 @@
 			"offsetpauseExp": "Sfalsa di mezzo LED l'indicatore di pausa rispetto a quello di riposo, così la pausa si distingue a colpo d'occhio.",
 			"reverserotationExp": "Inverte il verso in cui scorre l'indicatore luminoso, per esempio negli anelli montati in senso antiorario.",
 			"rfidflash": "Lampeggia brevemente quando riconosce un tag",
-			"rfidflashExp": "Conferma un tag NFC già associato con un breve lampo verde, così si vede che è stato accettato. Un tag sconosciuto viene comunque segnalato in rosso."
+			"rfidflashExp": "Conferma un tag NFC già associato con un breve lampo verde, così si vede che è stato accettato. Un tag sconosciuto viene comunque segnalato in rosso.",
+			"suonotessera": "Suono di conferma quando legge una tessera",
+			"suonotesseraExp": "Un tocco breve e morbido appena la tessera viene letta, e un suono diverso se la tessera non è associata. Serve a riempire i due o tre secondi fra l'appoggio e l'inizio della storia. I file stanno in /sistema sulla microSD."
 		},
 		"buttons": {
 			"title": "Azioni dei tasti",

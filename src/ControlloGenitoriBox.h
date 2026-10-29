@@ -19,6 +19,10 @@ void Box_AlimentaLed(bool acceso);
 // Carica regole e stato dalla memoria non volatile. Da chiamare in setup().
 void ControlloGenitoriBox_Init(void);
 
+// [BOX] Da chiamare nel loop: sfuma l'ultima storia concessa prima del
+// riposo. La decisione se sfumare la prende la logica pura; qui si fa.
+void ControlloGenitoriBox_Cyclic(void);
+
 // Una statuina o un vinile e' stato appoggiato: si puo' riprodurre?
 // Se no, fa partire il messaggio della nanna e poi manda il box a dormire.
 bool ControlloGenitoriBox_PuoPartire(const char *uid);

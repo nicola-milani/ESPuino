@@ -238,6 +238,7 @@ void loop() {
 	Battery_Cyclic();
 	Button_Cyclic();
 	System_Cyclic();
+	ControlloGenitoriBox_Cyclic(); // [BOX] dissolvenza dell'ultima storia
 	Rfid_PreferenceLookupHandler();
 
 	if (gPrefsSettings.getBool("playLastOnBoot", false)) {

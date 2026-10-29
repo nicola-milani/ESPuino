@@ -67,7 +67,9 @@
 			"offsetpauseExp": "Offsets the pause indicator by half an LED spacing compared to the normal idle indicator, so pause is visually distinguishable from idle.",
 			"reverserotationExp": "Reverses the direction the LED indicator runs in, e.g. for rings mounted counter-clockwise instead of clockwise.",
 			"rfidflash": "Briefly flash all LEDs when a tag is recognized",
-			"rfidflashExp": "Acknowledges an assigned RFID tag with a brief green flash, so you can see that the tag was accepted. An unknown tag is still acknowledged in red."
+			"rfidflashExp": "Acknowledges an assigned RFID tag with a brief green flash, so you can see that the tag was accepted. An unknown tag is still acknowledged in red.",
+			"suonotessera": "Confirmation sound when a card is read",
+			"suonotesseraExp": "A short, soft sound as soon as the card is read, and a different one if the card is not assigned. Files live in /sistema on the microSD."
 		},
 		"buttons": {
 			"title": "Button assignments",
