@@ -2650,6 +2650,20 @@
 		<!-- ### Tab Tools ### -->
 		<div class="tab-pane main-tab-pane fade select-div" id="nav-tools" role="tabpanel"
 			aria-labelledby="nav-tools-tab">
+				<!-- [BOX] task 7: esporta e importa la configurazione. -->
+				<div class="container">
+					<legend class="mb-3" data-i18n="tools.backup.title"></legend>
+					<div class="settings-group-card">
+						<p data-i18n="tools.backup.desc"></p>
+						<button type="button" class="btn btn-primary" id="boxEsporta"
+							data-i18n="tools.backup.export"></button>
+						<hr>
+						<input type="file" class="form-control mb-2" id="boxImportaFile" accept="application/json,.json">
+						<div id="boxAnteprima" class="mb-2"></div>
+						<button type="button" class="btn btn-warning" id="boxApplica" disabled
+							data-i18n="tools.backup.apply"></button>
+					</div>
+				</div>
 				<div class="container" id="savedAssignments">
 					<legend class="mb-3" data-i18n="tools.nvs.title"></legend>
 					<div class="container" style="padding: 0" id="listNvs">
@@ -2981,6 +2995,88 @@
 				fieldset.disabled = !active;
 			}
 		}
+
+
+		/* [BOX] task 7 — backup della configurazione.
+		   L'anteprima si calcola qui, confrontando il file con /esporta del box
+		   davanti a noi: il firmware non deve saper fare un diff, e il genitore
+		   vede cosa sta per sovrascrivere prima di premere Applica. */
+		(function () {
+			let daImportare = null;
+
+			function pronti(fn) {
+				if (document.readyState !== 'loading') { fn(); }
+				else { document.addEventListener('DOMContentLoaded', fn); }
+			}
+
+			pronti(function () {
+				const bottone = document.getElementById('boxEsporta');
+				const file = document.getElementById('boxImportaFile');
+				const applica = document.getElementById('boxApplica');
+				const anteprima = document.getElementById('boxAnteprima');
+				if (!bottone || !file || !applica || !anteprima) { return; }
+
+				bottone.addEventListener('click', async function () {
+					try {
+						const testo = await (await fetch('/esporta', { cache: 'no-store' })).text();
+						const a = document.createElement('a');
+						a.href = URL.createObjectURL(new Blob([testo], { type: 'application/json' }));
+						a.download = 'backup-' + (JSON.parse(testo).box || 'box') + '.json';
+						a.click();
+						URL.revokeObjectURL(a.href);
+					} catch (e) {
+						anteprima.textContent = 'Non sono riuscito a leggere la configurazione dal box.';
+					}
+				});
+
+				file.addEventListener('change', async function () {
+					applica.disabled = true;
+					daImportare = null;
+					anteprima.textContent = '';
+					if (!file.files.length) { return; }
+					let dati;
+					try {
+						dati = JSON.parse(await file.files[0].text());
+					} catch (e) {
+						anteprima.textContent = 'Non e\u2019 un file di backup leggibile.';
+						return;
+					}
+					if (!dati.formato) {
+						anteprima.textContent = 'Manca il numero di formato: non e\u2019 un backup di questo box.';
+						return;
+					}
+					let attuale = { tessere: [] };
+					try { attuale = await (await fetch('/esporta', { cache: 'no-store' })).json(); } catch (e) { }
+					const ora = new Set((attuale.tessere || []).map(function (x) { return x.id; }));
+					const arrivano = dati.tessere || [];
+					const nuove = arrivano.filter(function (x) { return !ora.has(x.id); }).length;
+					anteprima.textContent = nuove + ' tessere nuove, ' + (arrivano.length - nuove) + ' sovrascritte.'
+						+ (dati.genitori ? ' Le regole del controllo genitori vengono sostituite.' : '')
+						+ (dati.box ? ' Backup del box \u00ab' + dati.box + '\u00bb.' : '');
+					daImportare = dati;
+					applica.disabled = false;
+				});
+
+				applica.addEventListener('click', async function () {
+					if (!daImportare) { return; }
+					applica.disabled = true;
+					anteprima.textContent = 'Importo\u2026';
+					try {
+						const r = await fetch('/importa', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(daImportare)
+						});
+						if (!r.ok) { throw new Error(r.status); }
+						const esito = await r.json();
+						anteprima.textContent = 'Importate ' + esito.tessere + ' tessere. Le regole sono quelle del backup.';
+					} catch (e) {
+						anteprima.textContent = 'Importazione non riuscita.';
+						applica.disabled = false;
+					}
+				});
+			});
+		})();
 
 		i18next.use(i18nextHttpBackend).init({
 			backend: {

@@ -107,6 +107,9 @@ static void handleGetGenitori(AsyncWebServerRequest *request);                  
 static void handleGetStatoBox(AsyncWebServerRequest *request);                      // [BOX] task 9b
 static void handlePostComando(AsyncWebServerRequest *request);                      // [BOX] task 9b
 static void handlePostFuso(AsyncWebServerRequest *request);                         // [BOX] task 9b
+static void handleGetEsporta(AsyncWebServerRequest *request);                       // [BOX] task 7
+static void handlePostImporta(AsyncWebServerRequest *request, JsonVariant &json);   // [BOX] task 7
+static bool EsportaTesseraCallback(const char *key, void *data);                    // [BOX] task 7
 static void handlePostGenitori(AsyncWebServerRequest *request, JsonVariant &json);  // [BOX] task 6
 static void handleGetInfo(AsyncWebServerRequest *request);
 static void handleGetSettings(AsyncWebServerRequest *request);
@@ -654,6 +657,10 @@ void webserverStart(void) {
 		// [BOX] task 9b: il fuso orario, che fino al 29 ottobre era compilato
 		// nel firmware. Lo chiede la pagina del primo avvio.
 		wServer.on("/fuso", HTTP_POST, handlePostFuso);
+		// [BOX] task 7: esporta e importa la configurazione. Serve a rimettere
+		// in piedi un box rotto senza riassociare una per una le tessere.
+		wServer.on("/esporta", HTTP_GET, handleGetEsporta);
+		wServer.addHandler(new AsyncCallbackJsonWebHandler("/importa", handlePostImporta));
 		wServer.addHandler(new AsyncCallbackJsonWebHandler("/genitori", handlePostGenitori));
 
 		// MediaHub registered servers (concept §5.1)
@@ -2883,6 +2890,152 @@ static void handleDeleteRFIDRequest(AsyncWebServerRequest *request) {
 // Registered MediaHub servers (concept §5.1): pure Web-UI enrollment
 // convenience, never read by the runtime playback flow.
 // ============================================================
+// [BOX] task 7 — esportazione e importazione
+//
+// Delle tessere si esporta la stringa NVS **grezza**: dentro ci sono gia'
+// cartella, modo, posizione salvata e ultima traccia, nel formato che il
+// firmware sa rileggere. Reinterpretarla per riscriverla uguale sarebbe solo
+// un modo in piu' di sbagliare.
+#define BOX_FORMATO_ESPORTAZIONE 1
+
+static bool EsportaTesseraCallback(const char *key, void *data) {
+	JsonArray *tessere = (JsonArray *) data;
+	JsonObject o = tessere->add<JsonObject>();
+	o["id"] = key;
+	o["valore"] = gPrefsRfid.getString(key, "");
+	return true;
+}
+
+static void handleGetEsporta(AsyncWebServerRequest *request) {
+	AsyncJsonResponse *response = new AsyncJsonResponse(false);
+	JsonObject root = response->getRoot();
+
+	root["formato"] = BOX_FORMATO_ESPORTAZIONE;
+	root["box"] = Wlan_GetHostname();
+	root["fuso"] = System_GetTimeZone();
+
+	struct tm quando;
+	char data[32] = "";
+	if (getLocalTime(&quando, 50)) {
+		strftime(data, sizeof(data), "%d/%m/%Y %H:%M", &quando);
+	}
+	root["esportato"] = data;
+
+	JsonArray tessere = root["tessere"].to<JsonArray>();
+	listNVSKeys("rfidTags", &tessere, EsportaTesseraCallback);
+
+	// Le regole del controllo genitori: senza, un box rimesso in piedi
+	// ripartirebbe senza fasce di riposo, cioe' con le regole tolte.
+	const box::Regole r = ControlloGenitoriBox_Regole();
+	JsonObject g = root["genitori"].to<JsonObject>();
+	g["volumeMassimoNormale"] = r.volumeMassimoNormale;
+	g["volumeMassimoNanna"] = r.volumeMassimoNanna;
+	g["storieConcesseNanna"] = r.storieConcesseNanna;
+	g["dissolvenzaSecondi"] = r.dissolvenzaSecondi;
+	g["oraDelMattino"] = r.oraDelMattino;
+	JsonArray giorni = g["giorni"].to<JsonArray>();
+	for (int i = 0; i < 7; i++) {
+		JsonArray fasce = giorni.add<JsonArray>();
+		for (int j = 0; j < box::MAX_FASCE; j++) {
+			const box::Fascia &f = r.fasce[i][j];
+			JsonObject o = fasce.add<JsonObject>();
+			o["attiva"] = f.attiva;
+			o["inizio"] = f.inizio;
+			o["fine"] = f.fine;
+			o["storie"] = f.storieConcesse;
+			o["volume"] = f.volumeMassimo;
+		}
+	}
+
+	response->setLength();
+	request->send(response);
+	System_UpdateActivityTimer();
+}
+
+static void handlePostImporta(AsyncWebServerRequest *request, JsonVariant &json) {
+	JsonObject obj = json.as<JsonObject>();
+
+	// Il numero di formato non e' burocrazia: un file di domani importato da
+	// un firmware di ieri scriverebbe tessere che non si sanno rileggere.
+	if (!obj["formato"].is<int>() || obj["formato"].as<int>() > BOX_FORMATO_ESPORTAZIONE) {
+		request->send(400, "text/plain; charset=utf-8", "formato non riconosciuto");
+		return;
+	}
+
+	uint16_t scritte = 0;
+	if (obj["tessere"].is<JsonArray>()) {
+		JsonArray elenco = obj["tessere"].as<JsonArray>();
+		for (JsonObject o : elenco) {
+			const char *id = o["id"];
+			const char *valore = o["valore"];
+			if (id == nullptr || valore == nullptr || strlen(id) == 0) {
+				continue;
+			}
+			if (gPrefsRfid.putString(id, valore) > 0) {
+				scritte++;
+			}
+		}
+	}
+
+	if (obj["genitori"].is<JsonObject>()) {
+		JsonObject g = obj["genitori"];
+		box::Regole r = ControlloGenitoriBox_Regole();
+		if (g["volumeMassimoNormale"].is<int>()) {
+			r.volumeMassimoNormale = g["volumeMassimoNormale"];
+		}
+		if (g["volumeMassimoNanna"].is<int>()) {
+			r.volumeMassimoNanna = g["volumeMassimoNanna"];
+		}
+		if (g["storieConcesseNanna"].is<int>()) {
+			r.storieConcesseNanna = g["storieConcesseNanna"];
+		}
+		if (g["dissolvenzaSecondi"].is<int>()) {
+			r.dissolvenzaSecondi = g["dissolvenzaSecondi"];
+		}
+		if (g["oraDelMattino"].is<int>()) {
+			r.oraDelMattino = g["oraDelMattino"];
+		}
+		if (g["giorni"].is<JsonArray>()) {
+			JsonArray settimana = g["giorni"].as<JsonArray>();
+			int i = 0;
+			for (JsonArray fasce : settimana) {
+				if (i >= 7) {
+					break;
+				}
+				int j = 0;
+				for (JsonObject f : fasce) {
+					if (j >= box::MAX_FASCE) {
+						break;
+					}
+					r.fasce[i][j].attiva = f["attiva"] | false;
+					r.fasce[i][j].inizio = f["inizio"] | 0;
+					r.fasce[i][j].fine = f["fine"] | 0;
+					r.fasce[i][j].storieConcesse = f["storie"] | 0;
+					r.fasce[i][j].volumeMassimo = f["volume"] | 0;
+					j++;
+				}
+				i++;
+			}
+		}
+		ControlloGenitoriBox_SalvaRegole(r);
+	}
+
+	if (obj["fuso"].is<const char *>()) {
+		System_SetTimeZone(obj["fuso"]);
+	}
+
+	// Il backup su SD lo rifa' anche ESPuino a ogni associazione: rifarlo qui
+	// vuol dire che il box importato ha subito un backup suo.
+	Web_DumpNvsToSd("rfidTags", backupFile);
+
+	AsyncJsonResponse *response = new AsyncJsonResponse(false);
+	JsonObject root = response->getRoot();
+	root["tessere"] = scritte;
+	response->setLength();
+	request->send(response);
+	System_UpdateActivityTimer();
+}
+
 // [BOX] task 9b — il fuso orario
 static void handlePostFuso(AsyncWebServerRequest *request) {
 	if (!request->hasParam("tz")) {
@@ -2949,6 +3102,13 @@ static void handleGetStatoBox(AsyncWebServerRequest *request) {
 	suona["tracce"] = c_e_qualcosa ? gPlayProperties.playlist->size() : 0;
 	suona["volume"] = AudioPlayer_GetCurrentVolume();
 	suona["volumeMassimo"] = AudioPlayer_GetMaxVolume();
+	// [BOX] task 8: storia o canzone. Il tipo non e' un campo a parte sul tag:
+	// e' il modo di riproduzione. Gli AUDIOBOOK* salvano la posizione e
+	// riprendono - e' quello che fa una storia; tutto il resto riparte da capo.
+	const uint8_t modo = gPlayProperties.playMode;
+	suona["tipo"] = (modo == AUDIOBOOK || modo == AUDIOBOOK_LOOP || modo == AUDIOBOOK_RECURSIVE)
+		? "storia"
+		: "musica";
 
 #ifdef MEASURE_BATTERY_VOLTAGE
 	const float livello = Battery_EstimateLevel();

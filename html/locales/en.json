@@ -694,6 +694,14 @@
 				"installPrompt": "Install the firmware from {{date}} (commit {{commit}}) now?\n\nPlatform: {{platform}}\nBranch: {{branch}}\nLanguage: {{language}}\n\nThe new firmware will now be installed on your ESPuino. This takes about a minute - if a Neopixel strip with multiple LEDs is connected, a progress animation (blue) will be shown during this time. With just a single LED, it will blink blue instead.",
 				"fetchError": "Could not fetch the firmware list."
 			}
+		},
+		"backup": {
+			"title": "Configuration backup",
+			"desc": "A file with every card, the parental rules and the time zone. Audio files are not included: they live on the microSD.",
+			"export": "Download backup",
+			"import": "Load a backup",
+			"preview": "What would change",
+			"apply": "Apply"
 		}
 	},
 	"mediahub": {

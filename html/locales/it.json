@@ -694,6 +694,14 @@
 				"installPrompt": "Vuoi installare adesso il firmware del {{date}} (commit {{commit}})?\n\nScheda: {{platform}}\nRamo: {{branch}}\nLingua: {{language}}\n\nIl nuovo firmware verrà installato sul tuo ESPuino. Ci vuole circa un minuto: se è collegata una striscia di Neopixel con più LED, durante l'attesa si vede un'animazione blu di avanzamento. Con un solo LED, lampeggia di blu.",
 				"fetchError": "Non è stato possibile scaricare l'elenco dei firmware."
 			}
+		},
+		"backup": {
+			"title": "Backup della configurazione",
+			"desc": "Un file con tutte le tessere, le regole del controllo genitori e il fuso orario. Serve a rimettere in piedi un box rotto senza riassociare le tessere una per una. Gli audio non ci sono: quelli stanno sulla microSD.",
+			"export": "Scarica il backup",
+			"import": "Carica un backup",
+			"preview": "Cosa cambierebbe",
+			"apply": "Applica"
 		}
 	},
 	"mediahub": {

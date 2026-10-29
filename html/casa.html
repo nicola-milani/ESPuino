@@ -751,11 +751,15 @@
 
 		function testoSuona(s) {
 			if (!s.attivo) { return ['Non sta suonando niente', 'Appoggia una tessera nello scanso']; }
-			const titolo = s.titolo && s.titolo.trim() ? s.titolo : 'una storia';
+			// Una storia si racconta, una canzone si suona: il verbo cambia, e
+			// la nota musicale si vede da lontano mentre si cucina.
+			const musica = s.tipo === 'musica';
+			const titolo = s.titolo && s.titolo.trim() ? s.titolo : (musica ? 'una canzone' : 'una storia');
 			const riga = (s.tracce > 1)
 				? `Traccia ${s.traccia} di ${s.tracce}, volume ${s.volume} di ${s.volumeMassimo}`
 				: `Volume ${s.volume} di ${s.volumeMassimo}`;
-			return [s.inPausa ? `In pausa: «${titolo}»` : `Sta raccontando «${titolo}»`, riga];
+			const verbo = musica ? '♪ Sta suonando' : 'Sta raccontando';
+			return [s.inPausa ? `In pausa: «${titolo}»` : `${verbo} «${titolo}»`, riga];
 		}
 
 		function mostraStato(s) {
