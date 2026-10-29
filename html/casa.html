@@ -832,6 +832,102 @@
 			}
 		}
 
+		/* ---------------------------------------------------------------
+		   Associare una tessera. Tre passi, e il primo non si puo' saltare:
+		   bisogna sapere QUALE tessera, e lo sa solo il box quando gliela
+		   appoggi. Si guarda /stato piu' spesso del solito finche' non
+		   compare una tessera diversa da quella che c'era quando il foglio
+		   si e' aperto - altrimenti si "assocerebbe" la tessera che sta
+		   suonando in quel momento.
+		   --------------------------------------------------------------- */
+		const MODI = {
+			// Una storia riprende da dove era rimasta, una canzone riparte
+			// dall'inizio: sono due modi diversi di ESPuino, non un dettaglio.
+			storia: { playMode: 3, titolo: 'Nuova tessera storia', cosa: 'la cartella della storia' },
+			musica: { playMode: 5, titolo: 'Nuova tessera musica', cosa: 'la cartella della canzone' },
+		};
+		// null = non so ancora quale tessera c'era prima. Finche' e' null non
+		// si puo' decidere niente: senza questo, chi appoggia la tessera
+		// subito dopo aver aperto il foglio si vedrebbe associare la tessera
+		// che stava suonando.
+		let tesseraDiPartenza = null;
+		let attesaTessera = null;
+
+		function avviaAssociazione(tipo) {
+			const m = MODI[tipo];
+			tesseraDiPartenza = null;
+			fetch('/stato', { cache: 'no-store' })
+				.then(r => r.json())
+				.then(s => { tesseraDiPartenza = s.ultimaTessera || ''; })
+				.catch(() => { tesseraDiPartenza = ''; });
+			clearInterval(attesaTessera);
+			attesaTessera = setInterval(() => cercaTessera(tipo), 700);
+			return `
+				<h2 id="foglioTitolo">${m.titolo}</h2>
+				<div class="attesa">
+					<span class="onda" aria-hidden="true">${tipo === 'storia' ? '🧸' : '🎵'}</span>
+					<p id="attesaTesto">Appoggia la tessera nello scanso sul fronte</p>
+				</div>
+				<button class="secondario" data-chiudi>Annulla</button>`;
+		}
+
+		async function cercaTessera(tipo) {
+			if (!foglio.hasAttribute('data-aperto')) { clearInterval(attesaTessera); return; }
+			if (tesseraDiPartenza === null) { return; }   // non so ancora da cosa distinguerla
+			let s;
+			try { s = await (await fetch('/stato', { cache: 'no-store' })).json(); } catch (e) { return; }
+			const id = s.ultimaTessera || '';
+			if (!id || id === tesseraDiPartenza) { return; }
+			clearInterval(attesaTessera);
+            // Una tessera gia' assegnata non si riassegna per sbaglio: si
+            // avvisa, e il genitore decide.
+			apri(await sceltaCartella(tipo, id, s.ultimaTesseraNota));
+		}
+
+		async function sceltaCartella(tipo, id, nota) {
+			const m = MODI[tipo];
+			let cartelle = [];
+			try {
+				const r = await fetch('/explorer?path=%2F', { cache: 'no-store' });
+				const elenco = await r.json();
+				cartelle = elenco.filter(v => v.dir).map(v => v.name);
+			} catch (e) { /* elenco vuoto: lo si dice sotto */ }
+			const voci = cartelle.length
+				? cartelle.map(c => `<button class="voce" data-cartella="${c}" data-tipo="${tipo}" data-id="${id}"><span>${c}</span></button>`).join('')
+				: '<p>Non riesco a leggere la microSD. Carica prima le storie.</p>';
+			return `
+				<h2 id="foglioTitolo">Scegli ${m.cosa}</h2>
+				<p>${nota ? '<b>Attenzione:</b> questa tessera è già assegnata. Scegliendo, la cambi.' : 'Tessera nuova, mai vista prima.'}</p>
+				<div class="elenco">${voci}</div>
+				<p class="esito" id="esitoTessera"></p>
+				<button class="secondario" data-chiudi>Annulla</button>`;
+		}
+
+		async function associa(id, cartella, tipo) {
+			const esito = E('esitoTessera');
+			if (esito) { esito.textContent = 'Un momento…'; }
+			try {
+				const r = await fetch('/rfid', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ id: id, fileOrUrl: '/' + cartella, playMode: MODI[tipo].playMode })
+				});
+				if (!r.ok) { throw new Error(r.status); }
+				apri(`
+					<h2 id="foglioTitolo">Fatto</h2>
+					<p>La tessera adesso ${tipo === 'storia' ? 'racconta' : 'suona'} <b>${cartella}</b>.
+					Appoggiala nello scanso per provarla.</p>
+					<button class="primario" data-chiudi>Chiudi</button>`);
+			} catch (e) {
+				if (esito) { esito.textContent = 'Non sono riuscito a salvare. Riprova.'; }
+			}
+		}
+
+		corpo.addEventListener('click', (ev) => {
+			const v = ev.target.closest('[data-cartella]');
+			if (v) { associa(v.dataset.id, v.dataset.cartella, v.dataset.tipo); }
+		});
+
 		/* La nanna la decide il controllo genitori, che e' gia' nel firmware:
 		   qui si manda solo l'azione. "Fino al mattino" non e' un numero di
 		   minuti scelto a caso - lo sa il box, che ha l'ora del mattino fra
@@ -897,36 +993,8 @@
 		const canzoni = ['Ninna nanna della sera', 'Il ballo del gatto', 'Filastrocca dei colori'];
 
 		const pannelli = {
-			storia: () => `
-				<h2 id="foglioTitolo">Nuova tessera</h2>
-				<div class="attesa">
-					<span class="onda" aria-hidden="true">🧸</span>
-					<p>Appoggia la tessera nello scanso sul fronte</p>
-				</div>
-				<button class="primario" data-poi="sceltaStoria">Finta lettura (è un mockup)</button>
-				<button class="secondario" data-chiudi>Annulla</button>`,
-			sceltaStoria: () => `
-				<h2 id="foglioTitolo">Che storia racconta?</h2>
-				<p>Tessera nuova, mai vista prima.</p>
-				<div class="elenco">
-					${storie.map(s => `<button class="voce" data-poi="fatto"><span>${s}</span><small>5 capitoli</small></button>`).join('')}
-				</div>
-				<button class="secondario" data-chiudi>Annulla</button>`,
-			musica: () => `
-				<h2 id="foglioTitolo">Nuova tessera musica</h2>
-				<div class="attesa">
-					<span class="onda" aria-hidden="true">🎵</span>
-					<p>Appoggia la tessera nello scanso sul fronte</p>
-				</div>
-				<button class="primario" data-poi="sceltaCanzone">Finta lettura (è un mockup)</button>
-				<button class="secondario" data-chiudi>Annulla</button>`,
-			sceltaCanzone: () => `
-				<h2 id="foglioTitolo">Che canzone suona?</h2>
-				<div class="elenco">
-					${canzoni.map(c => `<button class="voce" data-poi="fatto"><span>${c}</span><small>2:41</small></button>`).join('')}
-					<button class="voce" data-poi="fatto"><span>Scegli un file dal telefono</span><small>mp3, m4a</small></button>
-				</div>
-				<button class="secondario" data-chiudi>Annulla</button>`,
+			storia: () => avviaAssociazione('storia'),
+			musica: () => avviaAssociazione('musica'),
 			nanna: () => `
 				<h2 id="foglioTitolo">Nanna</h2>
 				<p>Blocca subito, senza toccare le fasce impostate.</p>

@@ -2941,6 +2941,13 @@ static void handleGetStatoBox(AsyncWebServerRequest *request) {
 	root["batteriaBassa"] = false;
 #endif
 
+	// L'ultima tessera letta: e' cosi' che la pagina "casa" sa quale tessera
+	// il genitore ha appena appoggiato per associarla. Si dice anche se e'
+	// gia' assegnata, perche' riassegnarla per sbaglio cancella una storia.
+	root["ultimaTessera"] = gCurrentRfidTagId;
+	root["ultimaTesseraNota"] = (strlen(gCurrentRfidTagId) > 0)
+		&& (gPrefsRfid.getString(gCurrentRfidTagId, "-1").compareTo("-1") != 0);
+
 	JsonObject rete = root["rete"].to<JsonObject>();
 	rete["ssid"] = Wlan_GetCurrentSSID();
 	rete["rssi"] = Wlan_GetRssi();
